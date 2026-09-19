@@ -450,6 +450,19 @@
     .results-head{margin:29px 0 13px}.results-grid{grid-template-columns:1fr;gap:10px}.result-card{padding:14px}.section-title{font-size:18px}.link-more{font-size:13px}.games-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.game-card{padding:12px 10px;min-width:0}.game-top{margin-bottom:14px}.game-ic{width:35px;height:35px;border-radius:10px}.game-card h3{font-size:13px;overflow-wrap:anywhere}.game-card p{font-size:10px;line-height:1.35}.game-arrow{display:none}.promo{display:flex;padding:15px}.promo .btn-outline{width:100%;justify-content:center}
   }
   @media (max-width:390px){.brand-text .n1{font-size:21px}.brand-text .n2{font-size:18px}.brand-mark{width:37px}.brand-mark::after{width:35px;height:35px;background-size:210px auto}.btn-auth{padding:8px;font-size:11px}.hero{min-height:395px}.hero-content h1{font-size:33px}.hero-orb{right:-214px}.section-title{font-size:17px}}
+
+  /* Arte real tomado de la referencia: sustituye el emoji y hace visible
+     la ilustración del guácharo sin modificar los controles de la página. */
+  .brand-mark{width:190px;height:72px;background:transparent;overflow:hidden}
+  .brand-mark::after{content:'';display:block;width:190px;height:72px;background:url('Imagen de Codex 19 sept 2026, 14_02_30.png') -18px -12px/510px auto no-repeat;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55));transform:none}
+  .brand-text{display:none}
+  .hero::after{z-index:1;background-image:linear-gradient(90deg,rgba(4,7,26,.98) 0%,rgba(5,7,28,.78) 42%,rgba(13,4,40,.12) 100%),url('Imagen de Codex 19 sept 2026, 14_02_30.png');background-size:1100px auto;background-position:86% -155px;background-repeat:no-repeat;opacity:.92;mix-blend-mode:normal}
+  .hero-orb{display:none}
+  @media (max-width:700px){
+    .brand-mark{width:158px;height:58px}.brand-mark::after{width:158px;height:58px;background-size:425px auto;background-position:-15px -10px}.header-actions{gap:5px}.auth-btns #btn-open-register{display:none}.btn-auth{padding:9px 9px}
+    .hero::after{background-size:740px auto;background-position:84% -108px;opacity:.96}.hero-content{max-width:210px}.hero-content h1{font-size:35px}.hero-content p{max-width:192px}.hero::before{opacity:.35}
+  }
+  @media (max-width:390px){.brand-mark{width:142px}.brand-mark::after{width:142px;background-size:382px auto}.hero-content{max-width:197px}.hero-content h1{font-size:32px}}
 </style>
 </head>
 <body>

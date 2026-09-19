@@ -419,6 +419,31 @@
     .hero-orb{display:none;}
     .wrap{padding:16px 14px 100px;}
   }
+
+  /* Estilo visual inspirado en la pantalla móvil de Guácharo Activo.
+     Las reglas se mantienen al final para no afectar la lógica existente. */
+  :root{
+    --bg:#030712;--bg-2:#090d22;--card:#090d25;--card-2:#11143b;
+    --purple-1:#5e19cf;--purple-2:#8d4bff;--purple-glow:#9d69ff;
+    --gold:#ffc51e;--gold-2:#ffe06a;--text:#f6f5ff;--text-dim:#aeb5ed;
+    --line:rgba(105,111,237,.22);--radius:20px;--radius-sm:16px;
+  }
+  body{background:radial-gradient(900px 550px at 100% -10%,rgba(57,34,160,.18),transparent 58%),linear-gradient(135deg,#030713 0%,#050918 48%,#02040c 100%);}
+  .wrap{max-width:1120px;padding:28px 38px 110px;}
+  header{padding-bottom:26px;border-bottom:1px solid rgba(102,107,226,.18);}
+  .brand{gap:10px}.brand-mark{width:62px;height:58px;background:transparent;box-shadow:none;border-radius:0;position:relative;overflow:visible}
+  .brand-mark::after{content:'🦅';font-size:51px;filter:drop-shadow(0 4px 3px rgba(0,0,0,.5));transform:rotate(-9deg)}
+  .brand-mark svg{display:none}.brand-text{display:flex;align-items:baseline;gap:2px}.brand-text .n1{font-size:34px;font-style:italic;letter-spacing:-.07em}.brand-text .n2{font-size:29px;font-style:italic;letter-spacing:-.07em;color:var(--gold)}
+  .header-actions{gap:12px}.pill{background:linear-gradient(135deg,#0d1031,#090b22);border-color:rgba(125,70,255,.44);border-radius:20px;padding:10px 17px}.pill .ic{background:transparent;color:#9259ff}.pill .label{font-size:12px}.pill .value{font-size:18px}.btn-auth{border-color:rgba(125,70,255,.45);border-radius:16px}.btn-auth.primary,.btn-outline{background:linear-gradient(135deg,#7735e8,#4b12b0)}
+  .hero{min-height:365px;padding:52px 48px;background:radial-gradient(500px 360px at 86% 40%,rgba(103,40,233,.58),transparent 63%),linear-gradient(108deg,#090b2d 0%,#10082f 57%,#1a0842 100%);border-color:rgba(87,99,221,.25);box-shadow:0 18px 55px rgba(0,0,0,.32)}
+  .hero::before{content:'';position:absolute;right:-80px;top:-145px;width:480px;height:650px;opacity:.7;background:radial-gradient(ellipse at 48% 50%,transparent 0 32%,#060816 33% 46%,transparent 47%),linear-gradient(125deg,transparent 44%,rgba(255,198,30,.95) 45% 47%,transparent 48%);transform:rotate(-12deg)}
+  .hero-content{max-width:490px}.hero-content h1{font-size:54px;line-height:.98;text-shadow:0 4px 0 rgba(2,3,12,.25)}.hero-content p{font-size:17px;color:#f1efff;max-width:380px}.cta{font-size:16px;padding:15px 29px;box-shadow:0 9px 24px rgba(255,190,20,.25)}
+  .hero-orb{right:0;width:480px;height:390px;opacity:1}.hero-orb::before{content:'GUÁCHARO';position:absolute;right:10px;top:92px;color:#060816;font:900 italic 63px/1 'Archivo Black',sans-serif;letter-spacing:-.08em;text-shadow:-2px 0 #8939ff,0 2px #8939ff;transform:rotate(-10deg);opacity:.92}.ball{z-index:2;border:3px solid #7228dd;box-shadow:inset 0 -10px 16px rgba(49,13,125,.5),0 13px 26px rgba(0,0,0,.45)}.ball.b1{left:15%;top:2%}.ball.b2{left:48%;top:58%}.ball.b3{right:3%;top:31%}
+  .grid2{grid-template-columns:1fr 1fr;gap:18px}.card,.result-card,.game-card{background:linear-gradient(135deg,rgba(12,15,45,.98),rgba(6,9,26,.98));border-color:rgba(82,94,214,.24);box-shadow:0 10px 28px rgba(0,0,0,.16)}.card{padding:24px}.card-title{font-size:17px}.card-title .ic,.section-title .ic{background:rgba(108,45,235,.25);color:#9962ff}.cbox{background:linear-gradient(145deg,#19114c,#100e31);border-color:rgba(110,80,234,.25)}.cbox .num{color:#ddd4ff}.meta-row{border-color:rgba(106,111,223,.2)}
+  .results-head{margin:36px 0 16px}.section-title{font-size:22px}.link-more{color:#a16cff;font-size:15px}.results-grid{grid-template-columns:repeat(2,1fr);gap:14px}.result-card{border-radius:17px}.rball,.hot-ball{border:2px solid #7434e3;background:radial-gradient(circle at 35% 28%,#fff 0%,#ded4ff 28%,#7541df 100%);color:#070717}.games-grid{gap:14px}.game-card{border-radius:17px}.game-ic.star{background:linear-gradient(145deg,#f0b900,#7c5600)}.game-ic.heart,.game-ic.chart{background:linear-gradient(145deg,#7f29eb,#3d0c9d)}.bottomnav{background:rgba(5,7,20,.95);border-color:rgba(108,112,232,.25);padding:12px 10px 17px}.navitem{font-size:12px}.navitem.active{color:#9c61ff}.navitem.active::after{height:4px;width:90px;bottom:-12px;background:#9552ff}
+  @media (max-width:700px){
+    .wrap{padding:17px 14px 105px}.brand-mark{width:47px;height:45px}.brand-mark::after{font-size:39px}.brand-text .n1{font-size:25px}.brand-text .n2{font-size:22px}.header-actions{width:100%;justify-content:space-between}.header-actions #mode-flag,.auth-btns{display:none!important}.pill{padding:8px 12px}.pill .value{font-size:15px}.hero{min-height:430px;padding:34px 26px;align-items:flex-start}.hero-content{max-width:235px}.hero-content h1{font-size:39px}.hero-content p{font-size:14px;margin:14px 0 24px}.hero-orb{display:block;right:-180px;top:52%;width:410px;height:300px}.hero-orb::before{font-size:47px;right:20px;top:75px}.ball.b1{width:61px;height:61px;font-size:21px;left:18%;top:1%}.ball.b2{width:82px;height:82px;font-size:28px;left:53%;top:61%}.ball.b3{width:58px;height:58px;font-size:20px;right:0;top:34%}.cta{font-size:14px;padding:13px 23px}.grid2{grid-template-columns:1fr}.grid2 .card:nth-child(2){display:none}.card{padding:20px}.countdown{display:flex;gap:8px}.cbox{flex:1;padding:11px 5px 8px}.cbox .num{font-size:26px}.results-grid{grid-template-columns:1fr}.results-grid .result-card:nth-child(n+2){display:none}.section-title{font-size:19px}.games-grid{grid-template-columns:repeat(3,1fr)}.game-card{padding:14px 12px}.game-top{margin-bottom:18px}.game-card h3{font-size:14px}.game-card p{font-size:11px}.game-arrow{display:none}.promo{display:none}
+  }
 </style>
 </head>
 <body>

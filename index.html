@@ -1484,7 +1484,7 @@ cargarResultados();
     } else {
       apCont.innerHTML = apuestas.map(a => {
         const color = a.estado === 'ganada' ? 'var(--gold)' : a.estado === 'perdida' ? 'var(--danger-ring)' : 'var(--text-dim)';
-        const num = codigoVisible(a.animalito_nombre, a.animalito_numero);
+        const num = (String(a.animalito_nombre||'').toUpperCase().indexOf('BALLENA')>=0 ? '00' : (String(a.animalito_nombre||'').toUpperCase().indexOf('DELF')>=0 ? '0' : String(a.animalito_numero).padStart(2,'0'))); /*FIX0*/
         return `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);">
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,#2a1a5a,#1a1038);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold);">${num}</div>

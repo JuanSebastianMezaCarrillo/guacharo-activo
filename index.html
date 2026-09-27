@@ -359,6 +359,53 @@
     background:linear-gradient(90deg, var(--purple-2), var(--gold));
   }
 
+  .animal-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+  }
+  @media(min-width:700px){ .animal-grid{grid-template-columns:repeat(4,1fr);} }
+  .animal-tile{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:12px 8px 10px;
+    text-align:center;
+    cursor:pointer;
+    min-height:96px;
+    transition:border-color .15s, transform .15s, background .15s;
+  }
+  .animal-tile:hover{border-color:var(--purple-glow);transform:translateY(-1px);}
+  .animal-tile.selected{
+    border-color:var(--gold);
+    background:linear-gradient(180deg, rgba(255,194,51,.12), rgba(22,16,51,.4));
+  }
+  .animal-tile .num{
+    font-family:'Archivo Black',sans-serif;
+    font-size:22px;
+    color:var(--gold);
+    line-height:1;
+  }
+  .animal-tile .nom{
+    font-size:11px;
+    font-weight:800;
+    margin-top:6px;
+    color:var(--text);
+    line-height:1.2;
+  }
+  .animal-tile input{
+    width:100%;
+    margin-top:8px;
+    padding:7px 6px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--bg-2);
+    color:var(--text);
+    font-weight:800;
+    font-size:13px;
+    text-align:center;
+    font-family:inherit;
+  }
   .demo-flag{
     text-align:center;font-size:12px;color:var(--text-dim);
     padding:14px 20px 0;font-weight:600;
@@ -758,36 +805,37 @@
   </div>
 </div>
 
-<!-- MODAL APOSTAR -->
-<div class="modal-overlay" id="apostar-modal">
-  <div class="modal-box" style="max-width:420px;">
-    <button class="modal-close" id="apostar-close-btn">✕</button>
-    <div class="modal-title display" style="font-size:15px;">HACER UNA APUESTA</div>
-    <div style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">
-      Elige la hora (se muestra en hora venezolana) y el animalito. Se descuenta de tu saldo al confirmar.
-      Premio: <b style="color:var(--gold);">x60</b>. Las apuestas se cierran 5 minutos antes de cada sorteo y se reabren 5 minutos después.
+<!-- VISTA JUGAR -->
+<div class="wrap" id="vista-jugar" style="display:none;padding-bottom:110px;">
+  <div class="hero" style="min-height:auto;padding:24px;">
+    <div class="hero-content">
+      <h1 class="display" style="font-size:26px;">Juega ahora</h1>
+      <p style="margin:0;">Elige una o varias horas y los animalitos. Cada combinación vale el valor por unidad. Premio x60.</p>
     </div>
-    <form id="apostar-form">
-      <div class="modal-field">
-        <label>Hora del sorteo (hora venezolana)</label>
-        <select id="apuesta-hora" required style="width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:14px;font-weight:600;">
-          <option value="">Selecciona hora…</option>
-        </select>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <label style="display:block;font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:10px;">Horas disponibles (puedes elegir varias)</label>
+    <div id="horas-grid" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    <div id="apuesta-msg" class="modal-msg" style="margin-top:8px;"></div>
+  </div>
+  <div class="animal-grid" id="animal-grid" style="margin-top:14px;"></div>
+  <div class="card" style="position:sticky;bottom:70px;margin-top:16px;z-index:40;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-dim);">VALOR POR UNIDAD</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <button type="button" class="btn-outline" id="unidad-menos" style="padding:8px 12px;">−</button>
+          <div id="unidad-valor" style="font-size:22px;font-weight:800;color:var(--gold);min-width:90px;text-align:center;">$500</div>
+          <button type="button" class="btn-outline" id="unidad-mas" style="padding:8px 12px;">+</button>
+        </div>
       </div>
-      <div class="modal-field">
-        <label>Animalito (número o nombre)</label>
-        <select id="apuesta-animalito" required style="width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:14px;font-weight:600;">
-          <option value="">Selecciona animalito…</option>
-        </select>
+      <div style="text-align:right;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-dim);">TOTAL</div>
+        <div id="apuesta-total" style="font-size:22px;font-weight:800;color:var(--gold);">$0</div>
+        <div id="apuesta-count" style="font-size:12px;color:var(--text-dim);">0 animalitos</div>
       </div>
-      <div class="modal-field">
-        <label>Monto a apostar</label>
-        <input type="number" id="apuesta-monto" min="1" step="1" required placeholder="Ej. 100">
-      </div>
-      <button type="submit" class="modal-submit">Confirmar apuesta</button>
-      <div class="modal-msg" id="apuesta-msg"></div>
-    </form>
-    <div id="mis-apuestas" style="margin-top:18px;"></div>
+    </div>
+    <button type="button" class="cta" id="btn-confirmar-apuestas" style="width:100%;justify-content:center;">Confirmar apuestas</button>
   </div>
 </div>
 
@@ -838,7 +886,7 @@
       <div class="ic">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6" stroke="currentColor" stroke-width="1.8"/></svg>
       </div>
-      <span>NÚMEROS JUGADOS</span>
+      <span>NÚMEROS JUGADOS HOY</span>
     </div>
     <div id="perfil-apuestas"></div>
   </div>
@@ -1267,31 +1315,81 @@ cargarResultados();
   });
 
   /* -------- APOSTAR -------- */
-  const selAnimal = document.getElementById('apuesta-animalito');
+  const MIN_APUESTA = 500;
+  let valorUnidad = MIN_APUESTA;
+  const seleccionados = new Set();
+  const grid = document.getElementById('animal-grid');
+
+  const horasSel = new Set();
+
+  function actualizarTotal(){
+    const combos = seleccionados.size * horasSel.size;
+    document.getElementById('unidad-valor').textContent = '$' + valorUnidad.toLocaleString('es-CO');
+    document.getElementById('apuesta-total').textContent = '$' + (combos * valorUnidad).toLocaleString('es-CO');
+    document.getElementById('apuesta-count').textContent = seleccionados.size + ' animalitos · ' + horasSel.size + ' horas';
+  }
+
   ANIMALITOS.forEach((a, i) => {
-    const opt = document.createElement('option');
-    opt.value = String(i);
-    opt.textContent = a.code + ' — ' + a.nombre;
-    selAnimal.appendChild(opt);
+    const tile = document.createElement('div');
+    tile.className = 'animal-tile';
+    tile.dataset.idx = String(i);
+    tile.innerHTML = `<div class="num">${a.code}</div><div class="nom">${a.nombre}</div>`;
+    tile.addEventListener('click', () => {
+      if (seleccionados.has(i)){
+        seleccionados.delete(i);
+        tile.classList.remove('selected');
+      } else {
+        seleccionados.add(i);
+        tile.classList.add('selected');
+      }
+      actualizarTotal();
+    });
+    grid.appendChild(tile);
   });
 
+  document.getElementById('unidad-menos').addEventListener('click', () => {
+    if (valorUnidad > MIN_APUESTA) valorUnidad -= MIN_APUESTA;
+    actualizarTotal();
+  });
+  document.getElementById('unidad-mas').addEventListener('click', () => {
+    valorUnidad += MIN_APUESTA;
+    actualizarTotal();
+  });
+  actualizarTotal();
+
   function llenarHorasDisponibles(){
-    const sel = document.getElementById('apuesta-hora');
-    const actual = sel.value;
+    const cont = document.getElementById('horas-grid');
     const horas = horasDisponiblesHoy(nowColombia());
-    sel.innerHTML = '<option value="">Selecciona hora…</option>';
+    [...horasSel].forEach(h => { if (!horas.includes(h)) horasSel.delete(h); });
+    cont.innerHTML = '';
+    if (!horas.length){
+      cont.innerHTML = '<div style="font-size:13px;color:var(--text-dim);">No hay horas disponibles ahora.</div>';
+      actualizarTotal();
+      return horas;
+    }
     horas.forEach(h => {
-      const opt = document.createElement('option');
-      opt.value = h;
-      opt.textContent = h;
-      sel.appendChild(opt);
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.textContent = h;
+      chip.style.cssText = 'padding:9px 12px;border-radius:999px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer;border:1px solid var(--line);background:var(--bg-2);color:var(--text);';
+      if (horasSel.has(h)){
+        chip.style.borderColor = 'var(--gold)';
+        chip.style.background = 'rgba(255,194,51,.16)';
+        chip.style.color = 'var(--gold)';
+      }
+      chip.addEventListener('click', () => {
+        if (horasSel.has(h)) horasSel.delete(h);
+        else horasSel.add(h);
+        llenarHorasDisponibles();
+        actualizarTotal();
+      });
+      cont.appendChild(chip);
     });
-    if (horas.includes(actual)) sel.value = actual;
+    actualizarTotal();
     return horas;
   }
 
-  const apostarModal = document.getElementById('apostar-modal');
-  const btnApostarSubmit = document.querySelector('#apostar-form .modal-submit');
+  const btnApostarSubmit = document.getElementById('btn-confirmar-apuestas');
 
   function refrescarEstadoApuesta(){
     const horas = llenarHorasDisponibles();
@@ -1301,12 +1399,12 @@ cargarResultados();
       btnApostarSubmit.disabled = true;
       btnApostarSubmit.style.opacity = '0.55';
       msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Sorteo cerrado. Las apuestas se reanudan 5 minutos después de las ' + labelVE(lock.ve) + '.';
+      msg.textContent = 'Sorteo cerrado. Se reanuda 5 minutos después de las ' + labelVE(lock.ve) + '.';
     } else if (!horas.length){
       btnApostarSubmit.disabled = true;
       btnApostarSubmit.style.opacity = '0.55';
       msg.style.color = 'var(--text-dim)';
-      msg.textContent = 'No hay sorteos disponibles por ahora. El próximo es mañana a las 08:00 a. m.';
+      msg.textContent = 'No hay sorteos disponibles por ahora.';
     } else {
       btnApostarSubmit.disabled = false;
       btnApostarSubmit.style.opacity = '1';
@@ -1314,34 +1412,31 @@ cargarResultados();
     }
   }
 
-  document.getElementById('btn-jugar').addEventListener('click', async () => {
+  async function abrirJugar(){
     const { data: { session } } = await sb.auth.getSession();
-    if (!session){
-      openModal('login');
-      return;
-    }
-    apostarModal.classList.add('open');
+    if (!session){ openModal('login'); return; }
+    mostrarVista('jugar');
     refrescarEstadoApuesta();
-    cargarMisApuestas();
-  });
-  document.getElementById('nav-apostar').addEventListener('click', () => {
-    mostrarVista('home');
-    document.getElementById('btn-jugar').click();
-  });
-  document.getElementById('apostar-close-btn').addEventListener('click', () => apostarModal.classList.remove('open'));
-  apostarModal.addEventListener('click', (e) => { if (e.target === apostarModal) apostarModal.classList.remove('open'); });
-  setInterval(() => { if (apostarModal.classList.contains('open')) refrescarEstadoApuesta(); }, 1000);
+  }
+
+  document.getElementById('btn-jugar').addEventListener('click', abrirJugar);
+  document.getElementById('nav-apostar').addEventListener('click', abrirJugar);
+  setInterval(() => {
+    if (document.getElementById('vista-jugar').style.display !== 'none') refrescarEstadoApuesta();
+  }, 1000);
 
   function mostrarVista(nombre){
     document.getElementById('vista-home').style.display = nombre === 'home' ? 'block' : 'none';
     document.getElementById('vista-promos').style.display = nombre === 'promos' ? 'block' : 'none';
     document.getElementById('vista-perfil').style.display = nombre === 'perfil' ? 'block' : 'none';
+    document.getElementById('vista-jugar').style.display = nombre === 'jugar' ? 'block' : 'none';
     document.querySelectorAll('.bottomnav .navitem').forEach(el => el.classList.remove('active'));
     if (nombre === 'promos') document.getElementById('nav-promos').classList.add('active');
     else if (nombre === 'perfil') document.getElementById('nav-perfil').classList.add('active');
     else document.getElementById('nav-apostar').classList.add('active');
     if (nombre === 'promos') cargarCanjes();
     if (nombre === 'perfil') cargarPerfil();
+    if (nombre === 'jugar') refrescarEstadoApuesta();
   }
 
   document.getElementById('nav-promos').addEventListener('click', () => mostrarVista('promos'));
@@ -1363,9 +1458,15 @@ cargarResultados();
     document.getElementById('perfil-saldo').textContent = '$' + Number(saldoRow ? saldoRow.saldo : 0).toLocaleString('es-CO');
 
     const apCont = document.getElementById('perfil-apuestas');
-    const { data: apuestas } = await sb.from('apuestas').select('*').eq('user_id', session.user.id).order('creado_en', { ascending: false }).limit(30);
+    const co = nowColombia();
+    const hoy = co.y + '-' + pad(co.mo) + '-' + pad(co.d);
+    const { data: apuestasRaw } = await sb.from('apuestas').select('*').eq('user_id', session.user.id).order('creado_en', { ascending: false }).limit(80);
+    const apuestas = (apuestasRaw || []).filter(a => {
+      const dia = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date(a.creado_en));
+      return dia === hoy;
+    });
     if (!apuestas || !apuestas.length){
-      apCont.innerHTML = '<div style="font-size:13px;color:var(--text-dim);">Aún no has jugado ningún número.</div>';
+      apCont.innerHTML = '<div style="font-size:13px;color:var(--text-dim);">Hoy no has jugado ningún número. Mañana este listado se reinicia solo.</div>';
     } else {
       apCont.innerHTML = apuestas.map(a => {
         const color = a.estado === 'ganada' ? 'var(--gold)' : a.estado === 'perdida' ? 'var(--danger-ring)' : 'var(--text-dim)';
@@ -1448,80 +1549,64 @@ cargarResultados();
     cargarCanjes();
   });
 
-  async function cargarMisApuestas(){
-    const cont = document.getElementById('mis-apuestas');
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session){ cont.innerHTML = ''; return; }
-    const { data, error } = await sb.from('apuestas')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .order('creado_en', { ascending: false })
-      .limit(8);
-    if (error || !data || !data.length){
-      cont.innerHTML = '<div style="font-size:12px;color:var(--text-dim);">Aún no tienes apuestas.</div>';
-      return;
-    }
-    cont.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px;">Tus últimas apuestas</div>' +
-      data.map(a => {
-        const color = a.estado === 'ganada' ? 'var(--gold)' : a.estado === 'perdida' ? 'var(--danger-ring)' : 'var(--text-dim)';
-        return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px;">
-          <span>${String(a.animalito_numero).padStart(2,'0')} ${a.animalito_nombre} · $${Number(a.monto).toLocaleString('es-VE')} · ${a.hora}</span>
-          <span style="font-weight:700;color:${color};text-transform:capitalize;">${a.estado}${a.premio > 0 ? ' +$'+Number(a.premio).toLocaleString('es-VE') : ''}</span>
-        </div>`;
-      }).join('');
-  }
-
-  document.getElementById('apostar-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
+  document.getElementById('btn-confirmar-apuestas').addEventListener('click', async () => {
     const msg = document.getElementById('apuesta-msg');
     const { data: { session } } = await sb.auth.getSession();
-    if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
-
-    const hora = document.getElementById('apuesta-hora').value;
-    const idx = document.getElementById('apuesta-animalito').value;
-    const monto = Number(document.getElementById('apuesta-monto').value);
-    const animal = ANIMALITOS[Number(idx)];
+    if (!session){ openModal('login'); return; }
     const lock = ventanaCierre(nowColombia());
-
     if (lock.activo){
       msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Sorteo cerrado por 10 minutos. Intenta de nuevo en un momento.';
-      refrescarEstadoApuesta();
+      msg.textContent = 'Sorteo cerrado por 10 minutos.';
       return;
     }
-    if (!hora || !horasDisponiblesHoy(nowColombia()).includes(hora)){
+    const horasOk = horasDisponiblesHoy(nowColombia()).filter(h => horasSel.has(h));
+    if (!horasOk.length){
       msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Esa hora ya no está disponible.';
-      refrescarEstadoApuesta();
+      msg.textContent = 'Selecciona al menos una hora disponible.';
       return;
     }
-    if (!animal || !monto || monto <= 0){
+    if (!seleccionados.size){
       msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Completa todos los campos.';
+      msg.textContent = 'Selecciona al menos un animalito.';
       return;
+    }
+
+    if (valorUnidad < MIN_APUESTA || valorUnidad % MIN_APUESTA !== 0){
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = 'El valor por unidad debe ser múltiplo de $500.';
+      return;
+    }
+    const jugadas = [];
+    for (const i of seleccionados){
+      for (const hora of horasOk){
+        jugadas.push({ animal: ANIMALITOS[i], monto: valorUnidad, hora });
+      }
     }
 
     msg.style.color = 'var(--text-dim)';
     msg.textContent = 'Procesando…';
-
-    const { data, error } = await sb.rpc('crear_apuesta', {
-      p_animalito_numero: animal.n,
-      p_animalito_nombre: animal.nombre,
-      p_monto: monto,
-      p_hora: hora
-    });
-
-    if (error){
-      msg.style.color = 'var(--danger-ring)';
-      msg.textContent = error.message.includes('Saldo insuficiente') ? 'Saldo insuficiente.' : ('Error: ' + error.message);
-      return;
+    let ok = 0;
+    for (const j of jugadas){
+      const { error } = await sb.rpc('crear_apuesta', {
+        p_animalito_numero: j.animal.n,
+        p_animalito_nombre: j.animal.nombre,
+        p_monto: j.monto,
+        p_hora: j.hora
+      });
+      if (error){
+        msg.style.color = 'var(--danger-ring)';
+        msg.textContent = (error.message.includes('Saldo insuficiente') ? 'Saldo insuficiente. ' : '') + 'Se registraron ' + ok + ' apuestas.';
+        renderAuthState();
+        return;
+      }
+      ok++;
     }
-
     msg.style.color = 'var(--gold)';
-    msg.textContent = 'Apuesta registrada. ¡Buena suerte!';
-    e.target.reset();
-    renderAuthState();       // actualiza el saldo mostrado
-    cargarMisApuestas();
+    msg.textContent = ok + ' apuesta(s) registradas. ¡Buena suerte!';
+    seleccionados.clear();
+    grid.querySelectorAll('.animal-tile.selected').forEach(t => t.classList.remove('selected'));
+    actualizarTotal();
+    renderAuthState();
   });
 })();
 </script>

@@ -319,8 +319,22 @@ async function cargarPromos(){
         <div style="font-weight:800;">${c.codigo}</div>
         <div style="font-size:11.5px;color:var(--text-dim);">$${Number(c.monto).toLocaleString('es-CO')} · usos ${c.usos_hechos}/${c.usos_max ?? '∞'} · vence ${c.vence_el || 'sin fecha'}</div>
       </div>
-      <span class="tag ${c.activo && !vencido ? 'tag-aprobada' : 'tag-rechazada'}">${!c.activo ? 'inactivo' : vencido ? 'vencido' : 'activo'}</span>`;
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+        <span class="tag ${c.activo && !vencido ? 'tag-aprobada' : 'tag-rechazada'}">${!c.activo ? 'inactivo' : vencido ? 'vencido' : 'activo'}</span>
+        <button class="btn-sm btn-outline" data-acc="${c.activo ? 'desactivar' : 'activar'}" data-id="${c.id}">${c.activo ? 'Desactivar' : 'Activar'}</button>
+        <button class="btn-sm btn-no" data-acc="eliminar" data-id="${c.id}">Eliminar</button>
+      </div>`;
     cont.appendChild(row);
+  });
+  cont.querySelectorAll('button[data-acc]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const acc = btn.dataset.acc;
+      if (acc === 'eliminar' && !confirm('¿Eliminar este código? Ya no se podrá redimir.')) return;
+      const fn = acc === 'eliminar' ? 'eliminar_codigo_promo' : acc === 'activar' ? 'activar_codigo_promo' : 'desactivar_codigo_promo';
+      const { error } = await sb.rpc(fn, { p_id: Number(btn.dataset.id) });
+      if (error) alert(error.message);
+      cargarPromos();
+    });
   });
 }
 

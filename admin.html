@@ -64,21 +64,39 @@
 
     <div class="card">
       <h3>Cargar resultado del sorteo</h3>
-      <label>Hora</label>
-      <input id="r-hora" placeholder="Ej. 09:00 p. m.">
+      <label>Hora del sorteo (hora venezolana)</label>
+      <select id="r-hora">
+        <option value="">Selecciona hora…</option>
+      </select>
       <label>Animalito ganador</label>
-      <input id="r-animalito" placeholder="Ej. TIGRE" style="text-transform:uppercase;">
-      <label>Número (00-99)</label>
-      <input id="r-numero" type="number" min="0" max="99">
-      <button class="btn-primary" id="btn-resultado">Guardar resultado</button>
+      <select id="r-animalito">
+        <option value="">Selecciona animalito…</option>
+      </select>
+      <button class="btn-primary" id="btn-resultado">Publicar resultado</button>
       <div class="msg" id="resultado-msg"></div>
+    </div>
+
+    <div class="card">
+      <h3>Códigos promocionales</h3>
+      <label>Código</label>
+      <input id="promo-codigo" placeholder="Ej. SUERTE60" style="text-transform:uppercase;">
+      <label>Monto a acreditar</label>
+      <input id="promo-monto" type="number" min="1" placeholder="Ej. 10000">
+      <label>Usos máximos (vacío = ilimitado)</label>
+      <input id="promo-usos" type="number" min="1" placeholder="Ej. 50">
+      <label>Fecha de caducidad (opcional)</label>
+      <input id="promo-vence" type="date">
+      <button class="btn-primary" id="btn-crear-promo">Crear código</button>
+      <div class="msg" id="promo-admin-msg"></div>
+      <h3 style="margin-top:18px;">Códigos creados</h3>
+      <div id="promo-lista"></div>
     </div>
 
     <!-- LISTA DE USUARIOS -->
     <div class="card" id="vista-lista">
       <h3>Usuarios</h3>
       <label>Buscar por teléfono</label>
-      <input id="buscar-tel" placeholder="Ej. 0412">
+      <input id="buscar-tel" placeholder="Ej. 300">
       <div id="usuarios-list"></div>
     </div>
 
@@ -118,6 +136,73 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let usuarioActual = null; // { id, nombre, telefono, creado_en }
 
+const VE_HOURS = [8,9,10,11,12,13,14,15,16,17,18,19];
+const ANIMALITOS = [
+  {n:0, code:'0', nombre:'DELFÍN'},{n:0, code:'00', nombre:'BALLENA'},
+  {n:1, code:'01', nombre:'CARNERO'},{n:2, code:'02', nombre:'TORO'},
+  {n:3, code:'03', nombre:'CIEMPÍES'},{n:4, code:'04', nombre:'ALACRÁN'},
+  {n:5, code:'05', nombre:'LEÓN'},{n:6, code:'06', nombre:'RANA'},
+  {n:7, code:'07', nombre:'PERICO'},{n:8, code:'08', nombre:'RATÓN'},
+  {n:9, code:'09', nombre:'ÁGUILA'},{n:10, code:'10', nombre:'TIGRE'},
+  {n:11, code:'11', nombre:'GATO'},{n:12, code:'12', nombre:'CABALLO'},
+  {n:13, code:'13', nombre:'MONO'},{n:14, code:'14', nombre:'PALOMA'},
+  {n:15, code:'15', nombre:'ZORRO'},{n:16, code:'16', nombre:'OSO'},
+  {n:17, code:'17', nombre:'PAVO'},{n:18, code:'18', nombre:'BURRO'},
+  {n:19, code:'19', nombre:'CHIVO'},{n:20, code:'20', nombre:'COCHINO'},
+  {n:21, code:'21', nombre:'GALLO'},{n:22, code:'22', nombre:'CAMELLO'},
+  {n:23, code:'23', nombre:'CEBRA'},{n:24, code:'24', nombre:'IGUANA'},
+  {n:25, code:'25', nombre:'GALLINA'},{n:26, code:'26', nombre:'VACA'},
+  {n:27, code:'27', nombre:'PERRO'},{n:28, code:'28', nombre:'ZAMURO'},
+  {n:29, code:'29', nombre:'ELEFANTE'},{n:30, code:'30', nombre:'CAIMÁN'},
+  {n:31, code:'31', nombre:'LAPA'},{n:32, code:'32', nombre:'ARDILLA'},
+  {n:33, code:'33', nombre:'PESCADO'},{n:34, code:'34', nombre:'VENADO'},
+  {n:35, code:'35', nombre:'JIRAFA'},{n:36, code:'36', nombre:'CULEBRA'},
+  {n:37, code:'37', nombre:'TORTUGA'},{n:38, code:'38', nombre:'BÚFALO'},
+  {n:39, code:'39', nombre:'LECHUZA'},{n:40, code:'40', nombre:'AVISPA'},
+  {n:41, code:'41', nombre:'CANGURO'},{n:42, code:'42', nombre:'TUCÁN'},
+  {n:43, code:'43', nombre:'MARIPOSA'},{n:44, code:'44', nombre:'CHIGÜIRE'},
+  {n:45, code:'45', nombre:'GARZA'},{n:46, code:'46', nombre:'PUMA'},
+  {n:47, code:'47', nombre:'PAVORREAL'},{n:48, code:'48', nombre:'PUERCOESPÍN'},
+  {n:49, code:'49', nombre:'PEREZA'},{n:50, code:'50', nombre:'CANARIO'},
+  {n:51, code:'51', nombre:'PELICANO'},{n:52, code:'52', nombre:'PULPO'},
+  {n:53, code:'53', nombre:'CARACOL'},{n:54, code:'54', nombre:'GRILLO'},
+  {n:55, code:'55', nombre:'OSO HORMIGUERO'},{n:56, code:'56', nombre:'TIBURÓN'},
+  {n:57, code:'57', nombre:'PATO'},{n:58, code:'58', nombre:'HORMIGA'},
+  {n:59, code:'59', nombre:'PANTERA'},{n:60, code:'60', nombre:'CAMALEÓN'},
+  {n:61, code:'61', nombre:'PANDA'},{n:62, code:'62', nombre:'CACHICAMO'},
+  {n:63, code:'63', nombre:'CANGREJO'},{n:64, code:'64', nombre:'GAVILÁN'},
+  {n:65, code:'65', nombre:'ARAÑA'},{n:66, code:'66', nombre:'LOBO'},
+  {n:67, code:'67', nombre:'AVESTRUZ'},{n:68, code:'68', nombre:'JAGUAR'},
+  {n:69, code:'69', nombre:'CONEJO'},{n:70, code:'70', nombre:'BISONTE'},
+  {n:71, code:'71', nombre:'GUACAMAYA'},{n:72, code:'72', nombre:'GORILA'},
+  {n:73, code:'73', nombre:'HIPOPÓTAMO'},{n:74, code:'74', nombre:'TURPIAL'},
+  {n:75, code:'75', nombre:'GUÁCHARO'}
+];
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function labelVE(veHour){
+  const ampm = veHour >= 12 ? 'p. m.' : 'a. m.';
+  let h12 = veHour % 12; if (h12 === 0) h12 = 12;
+  return pad(h12) + ':00 ' + ampm;
+}
+
+(function llenarSelectsAdmin(){
+  const selHora = document.getElementById('r-hora');
+  VE_HOURS.forEach(h => {
+    const opt = document.createElement('option');
+    opt.value = labelVE(h);
+    opt.textContent = labelVE(h);
+    selHora.appendChild(opt);
+  });
+  const selAnimal = document.getElementById('r-animalito');
+  ANIMALITOS.forEach((a, i) => {
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = a.code + ' — ' + a.nombre;
+    selAnimal.appendChild(opt);
+  });
+})();
+
 const loginView = document.getElementById('login-view');
 const app = document.getElementById('app');
 
@@ -145,6 +230,7 @@ async function checkSession(){
     app.style.display = 'block';
     document.getElementById('who').textContent = session.user.user_metadata?.telefono || ADMIN_PHONE;
     cargarUsuarios();
+    cargarPromos();
   } else {
     if (session && !esAdminSession(session)){
       await sb.auth.signOut();
@@ -182,11 +268,12 @@ document.getElementById('btn-logout').addEventListener('click', async () => {
 document.getElementById('btn-resultado').addEventListener('click', async () => {
   const msg = document.getElementById('resultado-msg');
   const hora = document.getElementById('r-hora').value.trim();
-  const animalito = document.getElementById('r-animalito').value.trim().toUpperCase();
-  const numero = document.getElementById('r-numero').value;
-  if (!hora || !animalito || numero === ''){
-    msg.style.color = 'var(--danger)'; msg.textContent = 'Completa todos los campos.'; return;
+  const animal = ANIMALITOS[Number(document.getElementById('r-animalito').value)];
+  if (!hora || !animal){
+    msg.style.color = 'var(--danger)'; msg.textContent = 'Selecciona la hora y el animalito.'; return;
   }
+  const animalito = animal.nombre;
+  const numero = animal.n;
   const { data: last } = await sb.from('resultados').select('sorteo').order('sorteo', { ascending: false }).limit(1);
   const sorteo = last && last.length ? last[0].sorteo + 1 : 4571;
 
@@ -215,7 +302,49 @@ document.getElementById('btn-resultado').addEventListener('click', async () => {
 
   document.getElementById('r-hora').value = '';
   document.getElementById('r-animalito').value = '';
-  document.getElementById('r-numero').value = '';
+});
+
+async function cargarPromos(){
+  const cont = document.getElementById('promo-lista');
+  const { data, error } = await sb.from('codigos_promo').select('*').order('creado_en', { ascending: false }).limit(20);
+  if (error){ cont.innerHTML = '<div class="sub">' + error.message + '</div>'; return; }
+  if (!data.length){ cont.innerHTML = '<div class="sub">Aún no hay códigos.</div>'; return; }
+  cont.innerHTML = '';
+  data.forEach(c => {
+    const vencido = c.vence_el && c.vence_el < new Date().toISOString().slice(0,10);
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.cursor = 'default';
+    row.innerHTML = `<div>
+        <div style="font-weight:800;">${c.codigo}</div>
+        <div style="font-size:11.5px;color:var(--text-dim);">$${Number(c.monto).toLocaleString('es-CO')} · usos ${c.usos_hechos}/${c.usos_max ?? '∞'} · vence ${c.vence_el || 'sin fecha'}</div>
+      </div>
+      <span class="tag ${c.activo && !vencido ? 'tag-aprobada' : 'tag-rechazada'}">${!c.activo ? 'inactivo' : vencido ? 'vencido' : 'activo'}</span>`;
+    cont.appendChild(row);
+  });
+}
+
+document.getElementById('btn-crear-promo').addEventListener('click', async () => {
+  const msg = document.getElementById('promo-admin-msg');
+  const codigo = document.getElementById('promo-codigo').value.trim();
+  const monto = Number(document.getElementById('promo-monto').value);
+  const usosRaw = document.getElementById('promo-usos').value;
+  const vence = document.getElementById('promo-vence').value || null;
+  if (!codigo || !monto){ msg.style.color = 'var(--danger)'; msg.textContent = 'Código y monto son obligatorios.'; return; }
+  const { error } = await sb.rpc('crear_codigo_promo', {
+    p_codigo: codigo,
+    p_monto: monto,
+    p_usos_max: usosRaw === '' ? null : Number(usosRaw),
+    p_vence_el: vence
+  });
+  if (error){ msg.style.color = 'var(--danger)'; msg.textContent = error.message; return; }
+  msg.style.color = 'var(--gold)';
+  msg.textContent = 'Código creado.';
+  document.getElementById('promo-codigo').value = '';
+  document.getElementById('promo-monto').value = '';
+  document.getElementById('promo-usos').value = '';
+  document.getElementById('promo-vence').value = '';
+  cargarPromos();
 });
 
 /* -------- Lista de usuarios -------- */

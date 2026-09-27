@@ -396,6 +396,13 @@
   }
   .animal-tile.fav .fav-star{color:#ff7ad9;}
   .animal-tile{position:relative;}
+  .btn-cerrar-vista{
+    position:absolute;top:16px;right:16px;z-index:5;
+    width:36px;height:36px;border-radius:12px;
+    border:1px solid var(--line);background:rgba(11,6,32,.45);
+    color:var(--text);font-size:18px;font-weight:700;line-height:34px;
+    padding:0;cursor:pointer;
+  }
   .stat-bar-row{display:flex;align-items:center;gap:10px;margin:8px 0;}
   .stat-bar-track{flex:1;height:10px;border-radius:99px;background:rgba(168,140,255,.12);overflow:hidden;}
   .stat-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple-2),var(--gold));}
@@ -817,7 +824,8 @@
 
 <!-- VISTA JUGAR -->
 <div class="wrap" id="vista-jugar" style="display:none;padding-bottom:110px;">
-  <div class="hero" style="min-height:auto;padding:24px;">
+  <div class="hero" style="min-height:auto;padding:24px;position:relative;">
+    <button type="button" class="btn-cerrar-vista" data-back="home" aria-label="Cerrar">✕</button>
     <div class="hero-content">
       <h1 class="display" style="font-size:26px;">Juega ahora</h1>
       <p style="margin:0;">Elige una o varias horas y los animalitos. Cada combinación vale el valor por unidad. Premio x60.</p>
@@ -851,7 +859,8 @@
 
 <!-- VISTA FAVORITOS -->
 <div class="wrap" id="vista-favoritos" style="display:none;">
-  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
+  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;position:relative;">
+    <button type="button" class="btn-cerrar-vista" data-back="home" aria-label="Cerrar">✕</button>
     <div class="hero-content">
       <h1 class="display" style="font-size:28px;">Favoritos</h1>
       <p style="margin-bottom:0;">Toca la estrella de un animalito al jugar para guardarlo aquí.</p>
@@ -865,7 +874,8 @@
 
 <!-- VISTA STATS -->
 <div class="wrap" id="vista-stats" style="display:none;">
-  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
+  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;position:relative;">
+    <button type="button" class="btn-cerrar-vista" data-back="home" aria-label="Cerrar">✕</button>
     <div class="hero-content">
       <h1 class="display" style="font-size:28px;">Análisis</h1>
       <p style="margin-bottom:0;">Frecuencia de los animalitos según los resultados publicados.</p>
@@ -884,7 +894,8 @@
 
 <!-- VISTA PROMOCIONES -->
 <div class="wrap" id="vista-promos" style="display:none;">
-  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
+  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;position:relative;">
+    <button type="button" class="btn-cerrar-vista" data-back="home" aria-label="Cerrar">✕</button>
     <div class="hero-content">
       <h1 class="display" style="font-size:28px;">Promociones</h1>
       <p style="margin-bottom:0;">Canjea un código y suma saldo a tu cuenta.</p>
@@ -911,7 +922,8 @@
 
 <!-- VISTA PERFIL -->
 <div class="wrap" id="vista-perfil" style="display:none;">
-  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
+  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;position:relative;">
+    <button type="button" class="btn-cerrar-vista" data-back="home" aria-label="Cerrar">✕</button>
     <div class="hero-content">
       <h1 class="display" style="font-size:26px;" id="perfil-nombre">Tu perfil</h1>
       <p style="margin:0 0 8px;" id="perfil-tel">—</p>
@@ -931,6 +943,7 @@
       </div>
       <span>NÚMEROS JUGADOS HOY</span>
     </div>
+    <div id="aviso-jugados" style="display:none;margin:0 0 12px;padding:10px 12px;border-radius:10px;border:1px solid var(--gold);background:rgba(255,194,51,.12);font-size:13px;font-weight:800;color:var(--gold);"></div>
     <div id="perfil-apuestas"></div>
   </div>
 
@@ -1556,6 +1569,9 @@ cargarCalientes();
   document.getElementById('card-stats').addEventListener('click', () => mostrarVista('stats'));
   document.getElementById('card-calientes').addEventListener('click', () => mostrarVista('stats'));
   document.getElementById('link-ver-stats').addEventListener('click', (e) => { e.preventDefault(); mostrarVista('stats'); });
+  document.querySelectorAll('.btn-cerrar-vista').forEach(btn => {
+    btn.addEventListener('click', () => mostrarVista(btn.dataset.back || 'home'));
+  });
 
   document.getElementById('unidad-menos').addEventListener('click', () => {
     if (valorUnidad > MIN_APUESTA) valorUnidad -= MIN_APUESTA;
@@ -1824,11 +1840,16 @@ cargarCalientes();
       ok++;
     }
     msg.style.color = 'var(--gold)';
-    msg.textContent = ok + ' apuesta(s) registradas. ¡Buena suerte!';
     seleccionados.clear();
     grid.querySelectorAll('.animal-tile.selected').forEach(t => t.classList.remove('selected'));
     actualizarTotal();
     renderAuthState();
+    const aviso = document.getElementById('aviso-jugados');
+    if (aviso){
+      aviso.style.display = 'block';
+      aviso.textContent = ok + ' número(s) quedaron registrados. Revisa Números jugados hoy.';
+    }
+    mostrarVista('perfil');
   });
 })();
 </script>

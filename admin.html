@@ -121,21 +121,40 @@ let usuarioActual = null; // { id, nombre, telefono, creado_en }
 const loginView = document.getElementById('login-view');
 const app = document.getElementById('app');
 
-async function checkSession(){
-  const { data: { session } } = await sb.auth.getSession();
-  if (session){
-    loginView.style.display = 'none';
-    app.style.display = 'block';
-    document.getElementById('who').textContent = session.user.user_metadata?.telefono || session.user.email;
-    cargarUsuarios();
-  } else {
-    loginView.style.display = 'block';
-    app.style.display = 'none';
-  }
+const ADMIN_PHONE = '3013254193';
+
+function soloDigitos(tel){
+  return String(tel || '').replace(/\D/g, '');
 }
 
 function telefonoAEmail(tel){
-  return tel.replace(/\D/g, '') + '@telefono.guacharoactivo.app';
+  return soloDigitos(tel) + '@telefono.guacharoactivo.app';
+}
+
+function esAdminSession(session){
+  if (!session) return false;
+  const metaTel = soloDigitos(session.user.user_metadata?.telefono);
+  const emailTel = soloDigitos((session.user.email || '').split('@')[0]);
+  return metaTel === ADMIN_PHONE || emailTel === ADMIN_PHONE;
+}
+
+async function checkSession(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (session && esAdminSession(session)){
+    loginView.style.display = 'none';
+    app.style.display = 'block';
+    document.getElementById('who').textContent = session.user.user_metadata?.telefono || ADMIN_PHONE;
+    cargarUsuarios();
+  } else {
+    if (session && !esAdminSession(session)){
+      await sb.auth.signOut();
+      const msg = document.getElementById('login-msg');
+      msg.style.color = 'var(--danger)';
+      msg.textContent = 'Esta cuenta no es administrador.';
+    }
+    loginView.style.display = 'block';
+    app.style.display = 'none';
+  }
 }
 
 document.getElementById('btn-login').addEventListener('click', async () => {
@@ -143,6 +162,11 @@ document.getElementById('btn-login').addEventListener('click', async () => {
   const password = document.getElementById('l-pass').value;
   const msg = document.getElementById('login-msg');
   msg.style.color = 'var(--text-dim)'; msg.textContent = 'Entrando…';
+  if (soloDigitos(phone) !== ADMIN_PHONE){
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'Solo el administrador puede entrar aquí.';
+    return;
+  }
   const { error } = await sb.auth.signInWithPassword({ email: telefonoAEmail(phone), password });
   if (error){ msg.style.color = 'var(--danger)'; msg.textContent = 'Teléfono o contraseña incorrectos.'; return; }
   msg.textContent = '';

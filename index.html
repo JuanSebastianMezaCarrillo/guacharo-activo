@@ -380,6 +380,25 @@
     border-color:var(--gold);
     background:linear-gradient(180deg, rgba(255,194,51,.12), rgba(22,16,51,.4));
   }
+  .animal-tile.fav{
+    border-color:#ff7ad9;
+    box-shadow:0 0 0 1px rgba(255,122,217,.35);
+  }
+  .animal-tile.fav.selected{
+    border-color:var(--gold);
+    box-shadow:0 0 0 1px rgba(255,194,51,.45);
+  }
+  .fav-star{
+    position:absolute;top:6px;right:6px;
+    width:22px;height:22px;border:none;border-radius:50%;
+    background:rgba(11,6,32,.55);color:#b8aed9;
+    font-size:12px;line-height:22px;padding:0;cursor:pointer;
+  }
+  .animal-tile.fav .fav-star{color:#ff7ad9;}
+  .animal-tile{position:relative;}
+  .stat-bar-row{display:flex;align-items:center;gap:10px;margin:8px 0;}
+  .stat-bar-track{flex:1;height:10px;border-radius:99px;background:rgba(168,140,255,.12);overflow:hidden;}
+  .stat-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--purple-2),var(--gold));}
   .animal-tile .num{
     font-family:'Archivo Black',sans-serif;
     font-size:22px;
@@ -556,6 +575,10 @@
       </div>
     </div>
   </header>
+  <div id="aviso-premio" style="display:none;margin:0 0 16px;padding:14px 16px;border-radius:14px;border:1px solid var(--gold);background:rgba(255,194,51,.12);">
+    <div style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:.06em;">PREMIO</div>
+    <div id="aviso-premio-texto" style="font-weight:800;margin-top:4px;"></div>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -611,21 +634,10 @@
           </div>
           <span>NÚMEROS CALIENTES</span>
         </div>
-        <a class="link-more" href="#">Ver todos</a>
+        <a class="link-more" href="#" id="link-ver-stats">Ver todos</a>
       </div>
-      <div class="hot-sub">Los más jugados en las últimas 24 horas</div>
-      <div class="hot-grid">
-        <div class="hot-ball">05</div>
-        <div class="hot-ball">16</div>
-        <div class="hot-ball">27</div>
-        <div class="hot-ball">32</div>
-        <div class="hot-ball">41</div>
-        <div class="hot-ball">06</div>
-        <div class="hot-ball">11</div>
-        <div class="hot-ball">18</div>
-        <div class="hot-ball">24</div>
-        <div class="hot-ball">37</div>
-      </div>
+      <div class="hot-sub">Los que más han salido en los sorteos publicados</div>
+      <div class="hot-grid" id="hot-grid"></div>
     </div>
   </div>
 
@@ -635,9 +647,8 @@
       <div class="ic">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6M5 15a8 8 0 0013.86 3.36M19 9A8 8 0 005.14 5.64" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </div>
-      <span>RESULTADOS RECIENTES</span>
+      <span>RESULTADOS DE HOY</span>
     </div>
-    <a class="link-more" href="#">Ver historial ›</a>
   </div>
 
   <div class="results-grid" id="results-grid"></div>
@@ -650,11 +661,10 @@
       </div>
       <span>JUEGOS Y APUESTAS</span>
     </div>
-    <a class="link-more" href="#">Todos los juegos ›</a>
   </div>
 
   <div class="games-grid">
-    <a class="game-card" href="#">
+    <button class="game-card" type="button" id="card-calientes" style="width:100%;text-align:left;color:inherit;">
       <div class="game-top">
         <div class="game-ic star">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 16.9 5.8 20.3l1.6-6.8L2.2 8.9l6.9-.6z"/></svg>
@@ -662,9 +672,9 @@
         <div class="game-arrow">›</div>
       </div>
       <h3>Números Calientes</h3>
-      <p>Descubre los más probables de hoy</p>
-    </a>
-    <a class="game-card" href="#">
+      <p>Los que más han salido</p>
+    </button>
+    <button class="game-card" type="button" id="card-favoritos" style="width:100%;text-align:left;color:inherit;">
       <div class="game-top">
         <div class="game-ic heart">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9C.7 8.3 2.5 5 6 5c2 0 3.5 1.1 4 2.4C10.5 6.1 12 5 14 5c3.5 0 5.3 3.3 3.5 7-2.5 4.4-9.5 9-9.5 9z"/></svg>
@@ -673,8 +683,8 @@
       </div>
       <h3>Favoritos</h3>
       <p>Tus números guardados</p>
-    </a>
-    <a class="game-card" href="#">
+    </button>
+    <button class="game-card" type="button" id="card-stats" style="width:100%;text-align:left;color:inherit;">
       <div class="game-top">
         <div class="game-ic chart">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
@@ -682,8 +692,8 @@
         <div class="game-arrow">›</div>
       </div>
       <h3>Análisis y Estadísticas</h3>
-      <p>Historial, tendencias y más</p>
-    </a>
+      <p>Frecuencia de cada número</p>
+    </button>
   </div>
 
   <!-- PROMO -->
@@ -839,6 +849,39 @@
   </div>
 </div>
 
+<!-- VISTA FAVORITOS -->
+<div class="wrap" id="vista-favoritos" style="display:none;">
+  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
+    <div class="hero-content">
+      <h1 class="display" style="font-size:28px;">Favoritos</h1>
+      <p style="margin-bottom:0;">Toca la estrella de un animalito al jugar para guardarlo aquí.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div id="favoritos-lista"></div>
+    <button type="button" class="cta" id="btn-jugar-favoritos" style="width:100%;justify-content:center;margin-top:16px;">Jugar favoritos</button>
+  </div>
+</div>
+
+<!-- VISTA STATS -->
+<div class="wrap" id="vista-stats" style="display:none;">
+  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
+    <div class="hero-content">
+      <h1 class="display" style="font-size:28px;">Análisis</h1>
+      <p style="margin-bottom:0;">Frecuencia de los animalitos según los resultados publicados.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:16px;">
+      <div class="ic fire">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-7" stroke="currentColor" stroke-width="2"/></svg>
+      </div>
+      <span>MÁS FRECUENTES</span>
+    </div>
+    <div id="stats-barras"></div>
+  </div>
+</div>
+
 <!-- VISTA PROMOCIONES -->
 <div class="wrap" id="vista-promos" style="display:none;">
   <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
@@ -982,6 +1025,69 @@ const ANIMALITOS = [
 
 function pad(n){ return String(n).padStart(2,'0'); }
 
+function getFavoritos(){
+  try { return JSON.parse(localStorage.getItem('ga_favoritos') || '[]').map(Number); }
+  catch(e){ return []; }
+}
+function setFavoritos(arr){
+  localStorage.setItem('ga_favoritos', JSON.stringify(arr));
+}
+function toggleFavorito(idx){
+  const favs = getFavoritos();
+  const i = favs.indexOf(idx);
+  if (i >= 0) favs.splice(i, 1);
+  else favs.push(idx);
+  setFavoritos(favs);
+  return favs;
+}
+function claveResultado(r){
+  const nom = String(r.animalito || '').toUpperCase();
+  if (nom.indexOf('BALLENA') >= 0) return '00|BALLENA';
+  if (nom.indexOf('DELF') >= 0) return '0|DELFÍN';
+  return String(r.numero).padStart(2,'0') + '|' + (r.animalito || '');
+}
+async function frecuenciaResultados(){
+  const { data, error } = await sb.from('resultados').select('animalito, numero').limit(1000);
+  const map = {};
+  (error ? [] : data || []).forEach(r => {
+    const k = claveResultado(r);
+    map[k] = (map[k] || 0) + 1;
+  });
+  return Object.keys(map).map(k => {
+    const parts = k.split('|');
+    return { code: parts[0], nombre: parts.slice(1).join('|'), veces: map[k] };
+  }).sort((a,b) => b.veces - a.veces);
+}
+async function cargarCalientes(){
+  const grid = document.getElementById('hot-grid');
+  if (!grid) return;
+  const list = await frecuenciaResultados();
+  const top = list.slice(0, 10);
+  if (!top.length){
+    grid.innerHTML = '<div style="grid-column:1/-1;font-size:13px;color:var(--text-dim);">Aún no hay resultados publicados.</div>';
+    return;
+  }
+  grid.innerHTML = top.map(x => `<div class="hot-ball" title="${x.nombre} · ${x.veces}">${x.code}</div>`).join('');
+}
+async function cargarStatsVista(){
+  const cont = document.getElementById('stats-barras');
+  if (!cont) return;
+  const list = await frecuenciaResultados();
+  if (!list.length){
+    cont.innerHTML = '<div style="font-size:13px;color:var(--text-dim);">Cuando publiques resultados, aquí se armará la gráfica.</div>';
+    return;
+  }
+  const max = list[0].veces || 1;
+  cont.innerHTML = list.slice(0, 16).map(x => `
+    <div class="stat-bar-row">
+      <div style="width:38px;font-weight:800;color:var(--gold);">${x.code}</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${Math.max(8, (x.veces/max)*100)}%;"></div></div>
+      <div style="width:86px;text-align:right;font-size:12px;font-weight:700;color:var(--text-dim);">${x.veces} ${x.veces===1?'vez':'veces'}</div>
+    </div>
+    <div style="font-size:11px;color:var(--text-dim);margin:-4px 0 10px 38px;">${x.nombre}</div>
+  `).join('');
+}
+
 function codigoVisible(nombre, numero){
   const nom = String(nombre || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   if (nom.indexOf('BALLENA') !== -1) return '00';
@@ -1095,36 +1201,46 @@ function todayLabel(){
 function renderResultados(resultados){
   const grid = document.getElementById('results-grid');
   grid.innerHTML = '';
-  resultados.slice(0, 8).forEach(r => {
+  const porHora = {};
+  (resultados || []).forEach(r => { porHora[r.hora] = r; });
+  VE_HOURS.forEach(ve => {
+    const hora = labelVE(ve);
+    const r = porHora[hora];
     const card = document.createElement('div');
     card.className = 'result-card';
+    const num = r ? codigoVisible(r.animalito, r.numero) : '—';
+    const nom = r ? r.animalito : 'Pendiente';
     card.innerHTML = `
       <div class="result-top">
         <div class="ic">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6M5 15a8 8 0 0013.86 3.36M19 9A8 8 0 005.14 5.64" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         </div>
         <div>
-          <div class="rn">#${r.sorteo}</div>
-          <div class="rt">${todayLabel()} · ${r.hora}</div>
+          <div class="rn">${hora}</div>
+          <div class="rt">${todayLabel()}</div>
         </div>
       </div>
       <div class="result-balls" style="align-items:center;">
-        <div class="rball" style="width:auto;border-radius:10px;padding:0 10px;">${pad(Number(r.numero))}</div>
-        <div style="font-size:12px;font-weight:800;color:var(--gold);align-self:center;">${r.animalito}</div>
+        <div class="rball" style="width:auto;border-radius:10px;padding:0 10px;">${num}</div>
+        <div style="font-size:12px;font-weight:800;color:${r ? 'var(--gold)' : 'var(--text-dim)'};align-self:center;">${nom}</div>
       </div>
     `;
     grid.appendChild(card);
   });
-  if (resultados.length === 0){
-    grid.innerHTML = '<div style="color:var(--text-dim);font-weight:600;padding:12px;">Aún no se han cargado resultados.</div>';
-  }
 }
 
 async function cargarResultados(){
-  const { data, error } = await sb.from('resultados').select('*').order('sorteo', { ascending: false }).limit(8);
-  renderResultados(error ? [] : data);
+  const co = nowColombia();
+  const hoy = co.y + '-' + pad(co.mo) + '-' + pad(co.d);
+  const { data, error } = await sb.from('resultados').select('*').order('creado_en', { ascending: false }).limit(40);
+  const deHoy = (error ? [] : data || []).filter(r => {
+    const dia = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date(r.creado_en));
+    return dia === hoy;
+  });
+  renderResultados(deHoy);
 }
 cargarResultados();
+cargarCalientes();
 
 /* ============================================================
    ENTRAR / REGISTRARSE / CAJERO / RECARGAS / RETIROS
@@ -1166,6 +1282,21 @@ cargarResultados();
   authModal.addEventListener('click', (e) => { if (e.target === authModal) closeModal(); });
   tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
 
+  async function mostrarPremiosHoy(userId){
+    const av = document.getElementById('aviso-premio');
+    const txt = document.getElementById('aviso-premio-texto');
+    if (!av || !txt) return;
+    const { data } = await sb.from('apuestas').select('premio, animalito_nombre, hora').eq('user_id', userId).eq('estado', 'ganada').gt('premio', 0).order('creado_en', { ascending: false }).limit(20);
+    const co = nowColombia();
+    const hoy = co.y + '-' + pad(co.mo) + '-' + pad(co.d);
+    const deHoy = (data || []).filter(a => true);
+    const total = (data || []).reduce((s, a) => s + Number(a.premio || 0), 0);
+    if (!data || !data.length || total <= 0){ av.style.display = 'none'; return; }
+    const primera = data[0];
+    txt.textContent = 'Ganaste $' + total.toLocaleString('es-CO') + ' · último premio: ' + primera.animalito_nombre + ' a las ' + primera.hora;
+    av.style.display = 'block';
+  }
+
   async function renderAuthState(){
     const { data: { session } } = await sb.auth.getSession();
     if (session){
@@ -1178,7 +1309,10 @@ cargarResultados();
       const bal = data ? Number(data.saldo) : 0;
       cajeroEl.textContent = '$' + bal.toLocaleString('es-VE');
       document.getElementById('cajero-menu-saldo').textContent = '$' + bal.toLocaleString('es-VE');
+      mostrarPremiosHoy(session.user.id);
     } else {
+      const av = document.getElementById('aviso-premio');
+      if (av) av.style.display = 'none';
       loggedOutEl.style.display = 'flex';
       loggedInEl.style.display = 'none';
       cajeroPill.style.display = 'none';
@@ -1347,8 +1481,9 @@ cargarResultados();
     const tile = document.createElement('div');
     tile.className = 'animal-tile';
     tile.dataset.idx = String(i);
-    tile.innerHTML = `<div class="num">${a.code}</div><div class="nom">${a.nombre}</div>`;
-    tile.addEventListener('click', () => {
+    tile.innerHTML = `<button type="button" class="fav-star" data-fav="${i}" aria-label="Favorito">♥</button><div class="num">${a.code}</div><div class="nom">${a.nombre}</div>`;
+    tile.addEventListener('click', (ev) => {
+      if (ev.target.closest('.fav-star')) return;
       if (seleccionados.has(i)){
         seleccionados.delete(i);
         tile.classList.remove('selected');
@@ -1360,6 +1495,67 @@ cargarResultados();
     });
     grid.appendChild(tile);
   });
+
+  function pintarFavoritosTiles(){
+    const favs = getFavoritos();
+    grid.querySelectorAll('.animal-tile').forEach(t => {
+      const idx = Number(t.dataset.idx);
+      t.classList.toggle('fav', favs.indexOf(idx) >= 0);
+    });
+  }
+  grid.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.fav-star');
+    if (!btn) return;
+    ev.stopPropagation();
+    toggleFavorito(Number(btn.dataset.fav));
+    pintarFavoritosTiles();
+  });
+  pintarFavoritosTiles();
+
+  function renderListaFavoritos(){
+    const cont = document.getElementById('favoritos-lista');
+    const favs = getFavoritos();
+    if (!favs.length){
+      cont.innerHTML = '<div style="font-size:13px;color:var(--text-dim);">Todavía no tienes favoritos. En Juega ahora toca el corazón de un animalito.</div>';
+      return;
+    }
+    cont.innerHTML = favs.map(i => {
+      const a = ANIMALITOS[i];
+      if (!a) return '';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,#2a1a5a,#1a1038);border:1px solid #ff7ad9;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold);">${a.code}</div>
+          <div style="font-weight:800;">${a.nombre}</div>
+        </div>
+        <button type="button" class="btn-outline" data-unfav="${i}" style="padding:8px 12px;">Quitar</button>
+      </div>`;
+    }).join('');
+    cont.querySelectorAll('[data-unfav]').forEach(b => {
+      b.addEventListener('click', () => {
+        toggleFavorito(Number(b.dataset.unfav));
+        pintarFavoritosTiles();
+        renderListaFavoritos();
+      });
+    });
+  }
+
+  document.getElementById('btn-jugar-favoritos').addEventListener('click', async () => {
+    const favs = getFavoritos();
+    if (!favs.length) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ openModal('login'); return; }
+    favs.forEach(i => {
+      seleccionados.add(i);
+      const tile = grid.querySelector('[data-idx="'+i+'"]');
+      if (tile) tile.classList.add('selected');
+    });
+    actualizarTotal();
+    mostrarVista('jugar');
+  });
+  document.getElementById('card-favoritos').addEventListener('click', () => mostrarVista('favoritos'));
+  document.getElementById('card-stats').addEventListener('click', () => mostrarVista('stats'));
+  document.getElementById('card-calientes').addEventListener('click', () => mostrarVista('stats'));
+  document.getElementById('link-ver-stats').addEventListener('click', (e) => { e.preventDefault(); mostrarVista('stats'); });
 
   document.getElementById('unidad-menos').addEventListener('click', () => {
     if (valorUnidad > MIN_APUESTA) valorUnidad -= MIN_APUESTA;
@@ -1373,25 +1569,31 @@ cargarResultados();
 
   function llenarHorasDisponibles(){
     const cont = document.getElementById('horas-grid');
-    const horas = horasDisponiblesHoy(nowColombia());
+    const co = nowColombia();
+    const horas = horasDisponiblesHoy(co);
+    const lock = ventanaCierre(co);
     [...horasSel].forEach(h => { if (!horas.includes(h)) horasSel.delete(h); });
     cont.innerHTML = '';
-    if (!horas.length){
+    const horasMostrar = VE_HOURS.map(ve => labelVE(ve)).filter(h => horas.includes(h) || (lock.activo && h === labelVE(lock.ve)));
+    if (!horasMostrar.length){
       cont.innerHTML = '<div style="font-size:13px;color:var(--text-dim);">No hay horas disponibles ahora.</div>';
       actualizarTotal();
       return horas;
     }
-    horas.forEach(h => {
+    horasMostrar.forEach(h => {
+      const cerrada = lock.activo && h === labelVE(lock.ve);
       const chip = document.createElement('button');
       chip.type = 'button';
-      chip.textContent = h;
-      chip.style.cssText = 'padding:9px 12px;border-radius:999px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer;border:1px solid var(--line);background:var(--bg-2);color:var(--text);';
-      if (horasSel.has(h)){
+      chip.textContent = cerrada ? h + ' · CERRADA' : h;
+      chip.disabled = cerrada;
+      chip.style.cssText = 'padding:9px 12px;border-radius:999px;font-weight:800;font-size:12.5px;font-family:inherit;cursor:'+(cerrada?'not-allowed':'pointer')+';border:1px solid '+(cerrada?'var(--danger-ring)':'var(--line)')+';background:'+(cerrada?'rgba(255,95,122,.12)':'var(--bg-2)')+';color:'+(cerrada?'var(--danger-ring)':'var(--text)')+';opacity:'+(cerrada?'0.85':'1')+';';
+      if (!cerrada && horasSel.has(h)){
         chip.style.borderColor = 'var(--gold)';
         chip.style.background = 'rgba(255,194,51,.16)';
         chip.style.color = 'var(--gold)';
       }
       chip.addEventListener('click', () => {
+        if (cerrada) return;
         if (horasSel.has(h)) horasSel.delete(h);
         else horasSel.add(h);
         llenarHorasDisponibles();
@@ -1444,13 +1646,19 @@ cargarResultados();
     document.getElementById('vista-promos').style.display = nombre === 'promos' ? 'block' : 'none';
     document.getElementById('vista-perfil').style.display = nombre === 'perfil' ? 'block' : 'none';
     document.getElementById('vista-jugar').style.display = nombre === 'jugar' ? 'block' : 'none';
+    document.getElementById('vista-favoritos').style.display = nombre === 'favoritos' ? 'block' : 'none';
+    document.getElementById('vista-stats').style.display = nombre === 'stats' ? 'block' : 'none';
     document.querySelectorAll('.bottomnav .navitem').forEach(el => el.classList.remove('active'));
     if (nombre === 'promos') document.getElementById('nav-promos').classList.add('active');
     else if (nombre === 'perfil') document.getElementById('nav-perfil').classList.add('active');
+    else if (nombre === 'home' || nombre === 'favoritos' || nombre === 'stats') document.getElementById('nav-apostar').classList.add('active');
     else document.getElementById('nav-apostar').classList.add('active');
+    if (nombre === 'home') { document.querySelectorAll('.bottomnav .navitem').forEach(el => el.classList.remove('active')); document.getElementById('nav-apostar').classList.add('active'); }
     if (nombre === 'promos') cargarCanjes();
     if (nombre === 'perfil') cargarPerfil();
-    if (nombre === 'jugar') refrescarEstadoApuesta();
+    if (nombre === 'jugar') { refrescarEstadoApuesta(); pintarFavoritosTiles(); }
+    if (nombre === 'favoritos') renderListaFavoritos();
+    if (nombre === 'stats') cargarStatsVista();
   }
 
   document.getElementById('nav-promos').addEventListener('click', () => mostrarVista('promos'));

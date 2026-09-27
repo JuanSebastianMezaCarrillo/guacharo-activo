@@ -464,7 +464,7 @@
 </head>
 <body>
 
-<div class="wrap">
+<div class="wrap" id="vista-home">
 
   <header>
     <div class="brand">
@@ -480,13 +480,6 @@
     </div>
 
     <div class="header-actions">
-      <div class="pill" id="mode-flag">
-        <div class="ic">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" fill="currentColor"/></svg>
-        </div>
-        <div class="value">Vista pública</div>
-      </div>
-
       <!-- CAJERO -->
       <div class="pill clickable" id="cajero-pill" title="Tu saldo" style="display:none;">
         <div class="ic">
@@ -558,7 +551,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 8v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8"/></svg>
           <span id="next-draw-label">Hoy · 10:00 p. m.</span>
         </div>
-        <div class="tag-all">Todos los días<br>13 sorteos</div>
+        <div class="tag-all">Todos los días<br>12 sorteos</div>
       </div>
     </div>
 
@@ -647,20 +640,20 @@
   </div>
 
   <!-- PROMO -->
-  <div class="promo">
+  <div class="promo" id="btn-ir-promos" style="cursor:pointer;">
     <div class="promo-left">
       <div class="promo-ic">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5z"/></svg>
       </div>
       <div>
-        <h4>¡Tus números favoritos, más cerca del premio!</h4>
-        <p>Guarda tus números y recibe notificaciones cuando salgan.</p>
+        <h4>¿Tienes un código promocional?</h4>
+        <p>Canjéalo y recibe saldo extra en tu cuenta.</p>
       </div>
     </div>
-    <button class="btn-outline">+ Agregar favoritos</button>
+    <button class="btn-outline" type="button">Canjear código</button>
   </div>
 
-  <div class="demo-flag">Demo con fines ilustrativos · <b>no procesa dinero real</b> · horarios de sorteo aproximados</div>
+  <div class="demo-flag">12 sorteos diarios · 8:00 a. m. a 7:00 p. m. hora venezolana</div>
 
 </div>
 
@@ -726,7 +719,7 @@
     <button class="modal-close" id="recarga-close-btn">✕</button>
     <div class="modal-title display" style="font-size:15px;">RECARGAR SALDO</div>
     <div style="font-size:12.5px;color:var(--text-dim);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:16px;">
-      <b style="color:var(--gold);">DEMO</b> — Esta es una solicitud ficticia. Escribe cualquier monto y una referencia inventada. El administrador (tú) la aprobará o rechazará desde el panel y el saldo se actualizará automáticamente.
+      Escribe el monto y una referencia. El saldo se actualiza cuando el administrador confirme la solicitud.
     </div>
     <form id="recarga-form" class="auth-form">
       <div class="modal-field">
@@ -771,26 +764,14 @@
     <button class="modal-close" id="apostar-close-btn">✕</button>
     <div class="modal-title display" style="font-size:15px;">HACER UNA APUESTA</div>
     <div style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">
-      Elige la hora del sorteo, el animalito y el monto. Se descuenta de tu saldo al confirmar.
-      Premio: <b style="color:var(--gold);">x60</b> lo apostado.
+      Elige la hora (se muestra en hora venezolana) y el animalito. Se descuenta de tu saldo al confirmar.
+      Premio: <b style="color:var(--gold);">x60</b>. Las apuestas se cierran 5 minutos antes de cada sorteo y se reabren 5 minutos después.
     </div>
     <form id="apostar-form">
       <div class="modal-field">
-        <label>Hora del sorteo</label>
+        <label>Hora del sorteo (hora venezolana)</label>
         <select id="apuesta-hora" required style="width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:14px;font-weight:600;">
           <option value="">Selecciona hora…</option>
-          <option>08:00 a. m.</option>
-          <option>09:00 a. m.</option>
-          <option>10:00 a. m.</option>
-          <option>11:00 a. m.</option>
-          <option>12:00 p. m.</option>
-          <option>01:00 p. m.</option>
-          <option>02:00 p. m.</option>
-          <option>03:00 p. m.</option>
-          <option>04:00 p. m.</option>
-          <option>05:00 p. m.</option>
-          <option>06:00 p. m.</option>
-          <option>07:00 p. m.</option>
         </select>
       </div>
       <div class="modal-field">
@@ -810,17 +791,44 @@
   </div>
 </div>
 
+<!-- VISTA PROMOCIONES -->
+<div class="wrap" id="vista-promos" style="display:none;">
+  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
+    <div class="hero-content">
+      <h1 class="display" style="font-size:28px;">Promociones</h1>
+      <p style="margin-bottom:0;">Canjea un código y suma saldo a tu cuenta.</p>
+    </div>
+  </div>
+  <div class="card" style="max-width:480px;margin:0 auto;">
+    <div class="card-title" style="margin-bottom:16px;">
+      <div class="ic fire">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5z"/></svg>
+      </div>
+      <span>CANJEAR CÓDIGO</span>
+    </div>
+    <form id="form-codigo">
+      <div class="modal-field">
+        <label>Código promocional</label>
+        <input type="text" id="promo-codigo" placeholder="Ej. SUERTE60" required style="text-transform:uppercase;width:100%;background:var(--bg-2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:14px 12px;font-size:16px;font-weight:800;letter-spacing:0.08em;font-family:inherit;">
+      </div>
+      <button type="submit" class="modal-submit" style="margin-top:8px;">Redimir</button>
+      <div class="modal-msg" id="promo-msg"></div>
+    </form>
+    <div id="promo-historial" style="margin-top:18px;"></div>
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 <div class="bottomnav">
-  <div class="navitem active">
+  <div class="navitem active" data-view="home" id="nav-apostar">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12l8-8 8 8M6 10v9a1 1 0 001 1h4v-6h2v6h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     Apostar
   </div>
-  <div class="navitem">
+  <div class="navitem" data-view="promos" id="nav-promos">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 12v7a1 1 0 01-1 1H5a1 1 0 01-1-1v-7M2 7h20v5H2zM12 22V7M12 7c-1.5-3.5-6-4-6-1s3 3 6 1zM12 7c1.5-3.5 6-4 6-1s-3 3-6 1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
     Promociones
   </div>
-  <div class="navitem">
+  <div class="navitem" data-view="home" id="nav-perfil">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" stroke="currentColor" stroke-width="1.6"/></svg>
     Perfil
   </div>
@@ -834,74 +842,149 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ============================================================
-   RELOJ / CUENTA REGRESIVA REAL
-   Horario de referencia investigado para loterías de "animalitos"
-   venezolanas de este tipo (Guácharo Activo / Lotto Activo):
-   sorteos aproximadamente cada hora, desde las 9:00 a.m. hasta
-   las 9:00 p.m. (13 sorteos diarios). No existe una tabla oficial
-   única y pública, así que este horario es una aproximación
-   basada en patrones reportados por medios venezolanos.
+   HORARIO
+   Se MUESTRA en hora venezolana (8:00 a. m. a 7:00 p. m.)
+   pero el reloj real usa hora de Colombia (America/Bogota),
+   que va 1 hora detrás. El sorteo de las 8:00 a. m. VE
+   ocurre a las 7:00 a. m. en Colombia.
+   Cierre: 5 min antes hasta 5 min después = 10 min.
    ============================================================ */
 
-const DRAW_START_HOUR = 9;   // 9:00 a.m.
-const DRAW_END_HOUR   = 21;  // 9:00 p.m. (último sorteo)
-const BASE_DRAW_NUMBER = 4570; // número de sorteo base, solo ilustrativo
+const VE_HOURS = [8,9,10,11,12,13,14,15,16,17,18,19];
+const BASE_DRAW_NUMBER = 4570;
+const LOCK_MINUTES = 5;
 
-function pad(n){ return n.toString().padStart(2,'0'); }
+const ANIMALITOS = [
+  {n:0, code:'0', nombre:'DELFÍN'},{n:0, code:'00', nombre:'BALLENA'},
+  {n:1, code:'01', nombre:'CARNERO'},{n:2, code:'02', nombre:'TORO'},
+  {n:3, code:'03', nombre:'CIEMPÍES'},{n:4, code:'04', nombre:'ALACRÁN'},
+  {n:5, code:'05', nombre:'LEÓN'},{n:6, code:'06', nombre:'RANA'},
+  {n:7, code:'07', nombre:'PERICO'},{n:8, code:'08', nombre:'RATÓN'},
+  {n:9, code:'09', nombre:'ÁGUILA'},{n:10, code:'10', nombre:'TIGRE'},
+  {n:11, code:'11', nombre:'GATO'},{n:12, code:'12', nombre:'CABALLO'},
+  {n:13, code:'13', nombre:'MONO'},{n:14, code:'14', nombre:'PALOMA'},
+  {n:15, code:'15', nombre:'ZORRO'},{n:16, code:'16', nombre:'OSO'},
+  {n:17, code:'17', nombre:'PAVO'},{n:18, code:'18', nombre:'BURRO'},
+  {n:19, code:'19', nombre:'CHIVO'},{n:20, code:'20', nombre:'COCHINO'},
+  {n:21, code:'21', nombre:'GALLO'},{n:22, code:'22', nombre:'CAMELLO'},
+  {n:23, code:'23', nombre:'CEBRA'},{n:24, code:'24', nombre:'IGUANA'},
+  {n:25, code:'25', nombre:'GALLINA'},{n:26, code:'26', nombre:'VACA'},
+  {n:27, code:'27', nombre:'PERRO'},{n:28, code:'28', nombre:'ZAMURO'},
+  {n:29, code:'29', nombre:'ELEFANTE'},{n:30, code:'30', nombre:'CAIMÁN'},
+  {n:31, code:'31', nombre:'LAPA'},{n:32, code:'32', nombre:'ARDILLA'},
+  {n:33, code:'33', nombre:'PESCADO'},{n:34, code:'34', nombre:'VENADO'},
+  {n:35, code:'35', nombre:'JIRAFA'},{n:36, code:'36', nombre:'CULEBRA'},
+  {n:37, code:'37', nombre:'TORTUGA'},{n:38, code:'38', nombre:'BÚFALO'},
+  {n:39, code:'39', nombre:'LECHUZA'},{n:40, code:'40', nombre:'AVISPA'},
+  {n:41, code:'41', nombre:'CANGURO'},{n:42, code:'42', nombre:'TUCÁN'},
+  {n:43, code:'43', nombre:'MARIPOSA'},{n:44, code:'44', nombre:'CHIGÜIRE'},
+  {n:45, code:'45', nombre:'GARZA'},{n:46, code:'46', nombre:'PUMA'},
+  {n:47, code:'47', nombre:'PAVORREAL'},{n:48, code:'48', nombre:'PUERCOESPÍN'},
+  {n:49, code:'49', nombre:'PEREZA'},{n:50, code:'50', nombre:'CANARIO'},
+  {n:51, code:'51', nombre:'PELICANO'},{n:52, code:'52', nombre:'PULPO'},
+  {n:53, code:'53', nombre:'CARACOL'},{n:54, code:'54', nombre:'GRILLO'},
+  {n:55, code:'55', nombre:'OSO HORMIGUERO'},{n:56, code:'56', nombre:'TIBURÓN'},
+  {n:57, code:'57', nombre:'PATO'},{n:58, code:'58', nombre:'HORMIGA'},
+  {n:59, code:'59', nombre:'PANTERA'},{n:60, code:'60', nombre:'CAMALEÓN'},
+  {n:61, code:'61', nombre:'PANDA'},{n:62, code:'62', nombre:'CACHICAMO'},
+  {n:63, code:'63', nombre:'CANGREJO'},{n:64, code:'64', nombre:'GAVILÁN'},
+  {n:65, code:'65', nombre:'ARAÑA'},{n:66, code:'66', nombre:'LOBO'},
+  {n:67, code:'67', nombre:'AVESTRUZ'},{n:68, code:'68', nombre:'JAGUAR'},
+  {n:69, code:'69', nombre:'CONEJO'},{n:70, code:'70', nombre:'BISONTE'},
+  {n:71, code:'71', nombre:'GUACAMAYA'},{n:72, code:'72', nombre:'GORILA'},
+  {n:73, code:'73', nombre:'HIPOPÓTAMO'},{n:74, code:'74', nombre:'TURPIAL'},
+  {n:75, code:'75', nombre:'GUÁCHARO'}
+];
 
-function getNextDrawTime(now){
-  const d = new Date(now);
-  d.setMinutes(0,0,0);
-  let hour = d.getHours();
+function pad(n){ return String(n).padStart(2,'0'); }
 
-  if (hour < DRAW_START_HOUR) {
-    d.setHours(DRAW_START_HOUR);
-    return d;
-  }
-  if (hour >= DRAW_END_HOUR) {
-    // pasado el último sorteo del día -> primer sorteo de mañana
-    d.setDate(d.getDate()+1);
-    d.setHours(DRAW_START_HOUR);
-    return d;
-  }
-  // siguiente hora en punto dentro del rango de sorteos
-  d.setHours(hour+1);
-  return d;
+function labelVE(veHour){
+  const ampm = veHour >= 12 ? 'p. m.' : 'a. m.';
+  let h12 = veHour % 12; if (h12 === 0) h12 = 12;
+  return pad(h12) + ':00 ' + ampm;
 }
 
-function formatHourLabel(date, refNow){
-  const sameDay = date.toDateString() === refNow.toDateString();
-  const h = date.getHours();
-  const ampm = h >= 12 ? 'p. m.' : 'a. m.';
-  let h12 = h % 12; if (h12 === 0) h12 = 12;
-  return (sameDay ? 'Hoy' : 'Mañana') + ' · ' + h12 + ':00 ' + ampm;
+function nowColombia(){
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Bogota',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false
+  }).formatToParts(new Date());
+  const get = (t) => parts.find(p => p.type === t).value;
+  const h = Number(get('hour'));
+  return {
+    y: Number(get('year')),
+    mo: Number(get('month')),
+    d: Number(get('day')),
+    h: h === 24 ? 0 : h,
+    min: Number(get('minute')),
+    s: Number(get('second'))
+  };
 }
 
-function drawNumberFor(date){
-  // genera un número de sorteo incremental estable basado en la fecha/hora
-  const epochHours = Math.floor(date.getTime() / (1000*60*60));
-  return BASE_DRAW_NUMBER + (epochHours % 900);
+function minutosAhora(co){ return co.h * 60 + co.min; }
+
+function ventanaCierre(co){
+  for (const ve of VE_HOURS){
+    const coH = ve - 1;
+    const start = coH * 60 - LOCK_MINUTES;
+    const end = coH * 60 + LOCK_MINUTES;
+    const nowM = minutosAhora(co);
+    if (nowM >= start && nowM < end){
+      return { activo: true, ve, coH, start, end, nowM };
+    }
+  }
+  return { activo: false };
+}
+
+function sorteoDisponible(veHour, co){
+  const coH = veHour - 1;
+  return minutosAhora(co) < (coH * 60 - LOCK_MINUTES);
+}
+
+function horasDisponiblesHoy(co){
+  return VE_HOURS.filter(ve => sorteoDisponible(ve, co)).map(ve => labelVE(ve));
+}
+
+function proximoEvento(co){
+  const lock = ventanaCierre(co);
+  const nowM = minutosAhora(co) + co.s / 60;
+  if (lock.activo){
+    if (nowM < lock.coH * 60){
+      return { tipo: 'sorteo', ve: lock.ve, minutosRestantes: lock.coH * 60 - nowM };
+    }
+    return { tipo: 'reapertura', ve: lock.ve, minutosRestantes: lock.end - nowM };
+  }
+  for (const ve of VE_HOURS){
+    const coH = ve - 1;
+    if (nowM < coH * 60){
+      return { tipo: 'sorteo', ve, minutosRestantes: coH * 60 - nowM };
+    }
+  }
+  const hastaManana = (24 * 60 - nowM) + 7 * 60;
+  return { tipo: 'sorteo', ve: 8, minutosRestantes: hastaManana, manana: true };
 }
 
 function tickCountdown(){
-  const now = new Date();
-  const next = getNextDrawTime(now);
-  let diff = Math.max(0, next.getTime() - now.getTime());
-
-  const totalSeconds = Math.floor(diff/1000);
-  const hh = Math.floor(totalSeconds/3600);
-  const mm = Math.floor((totalSeconds%3600)/60);
-  const ss = totalSeconds%60;
-
+  const co = nowColombia();
+  const ev = proximoEvento(co);
+  const totalSeconds = Math.max(0, Math.floor(ev.minutosRestantes * 60));
+  const hh = Math.floor(totalSeconds / 3600);
+  const mm = Math.floor((totalSeconds % 3600) / 60);
+  const ss = totalSeconds % 60;
   document.getElementById('cd-h').textContent = pad(hh);
   document.getElementById('cd-m').textContent = pad(mm);
   document.getElementById('cd-s').textContent = pad(ss);
+  document.getElementById('box-s').classList.toggle('urgent', totalSeconds <= 60 || ventanaCierre(co).activo);
 
-  document.getElementById('next-draw-label').textContent = formatHourLabel(next, now);
-  document.getElementById('draw-number').textContent = '#' + drawNumberFor(next);
-
-  const urgent = totalSeconds <= 60;
-  document.getElementById('box-s').classList.toggle('urgent', urgent);
+  const etiqueta = labelVE(ev.ve);
+  if (ev.tipo === 'reapertura'){
+    document.getElementById('next-draw-label').textContent = 'Cerrado 10 min · ' + etiqueta;
+  } else {
+    document.getElementById('next-draw-label').textContent = (ev.manana ? 'Mañana' : 'Hoy') + ' · ' + etiqueta;
+  }
+  document.getElementById('draw-number').textContent = '#' + (BASE_DRAW_NUMBER + ev.ve);
 }
 
 setInterval(tickCountdown, 1000);
@@ -1052,9 +1135,17 @@ cargarResultados();
     if (error){
       msg.style.color = 'var(--danger-ring)';
       const t = (error.message || '').toLowerCase();
-      msg.textContent = (t.includes('registered') || t.includes('already') || t.includes('exists'))
-        ? 'Ese teléfono ya tiene una cuenta. Entra con tu contraseña.'
-        : 'No se pudo crear la cuenta.';
+      if (t.includes('registered') || t.includes('already') || t.includes('exists')){
+        msg.textContent = 'Ese teléfono ya tiene una cuenta. Entra con tu contraseña.';
+      } else {
+        msg.textContent = 'No se pudo crear la cuenta: ' + error.message;
+      }
+      return;
+    }
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = 'La cuenta se creó, pero Supabase pide confirmar el correo. Desactiva Confirm email.';
       return;
     }
     renderAuthState();
@@ -1139,39 +1230,53 @@ cargarResultados();
   });
 
   /* -------- APOSTAR -------- */
-  const ANIMALITOS = [
-    {n:0, nombre:'DELFÍN'},{n:00, nombre:'BALLENA'},{n:1, nombre:'CARNERO'},{n:2, nombre:'TORO'},
-    {n:3, nombre:'CIEMPÍES'},{n:4, nombre:'ALACRÁN'},{n:5, nombre:'LEÓN'},{n:6, nombre:'RANA'},
-    {n:7, nombre:'PERICO'},{n:8, nombre:'RATÓN'},{n:9, nombre:'ÁGUILA'},{n:10, nombre:'TIGRE'},
-    {n:11, nombre:'GATO'},{n:12, nombre:'CABALLO'},{n:13, nombre:'MONO'},{n:14, nombre:'PALOMA'},
-    {n:15, nombre:'ZORRO'},{n:16, nombre:'OSO'},{n:17, nombre:'PAVO'},{n:18, nombre:'BURRO'},
-    {n:19, nombre:'CHIVO'},{n:20, nombre:'COCHINO'},{n:21, nombre:'GALLO'},{n:22, nombre:'CAMELLO'},
-    {n:23, nombre:'CEBRA'},{n:24, nombre:'IGUANA'},{n:25, nombre:'GALLINA'},{n:26, nombre:'VACA'},
-    {n:27, nombre:'PERRO'},{n:28, nombre:'ZAMURO'},{n:29, nombre:'ELEFANTE'},{n:30, nombre:'CAIMÁN'},
-    {n:31, nombre:'LAPA'},{n:32, nombre:'ARDILLA'},{n:33, nombre:'PESCADO'},{n:34, nombre:'VENADO'},
-    {n:35, nombre:'JIRAFA'},{n:36, nombre:'CULEBRA'},{n:37, nombre:'TORTUGA'},{n:38, nombre:'BÚFALO'},
-    {n:39, nombre:'LECHUZA'},{n:40, nombre:'AVISPA'},{n:41, nombre:'CANGURO'},{n:42, nombre:'TUCÁN'},
-    {n:43, nombre:'MARIPOSA'},{n:44, nombre:'CHIGÜIRE'},{n:45, nombre:'GARZA'},{n:46, nombre:'PUMA'},
-    {n:47, nombre:'PAVORREAL'},{n:48, nombre:'PUERCOESPÍN'},{n:49, nombre:'PEREZA'},{n:50, nombre:'CANARIO'},
-    {n:51, nombre:'PELICANO'},{n:52, nombre:'PULPO'},{n:53, nombre:'CARACOL'},{n:54, nombre:'GRILLO'},
-    {n:55, nombre:'OSO HORMIGUERO'},{n:56, nombre:'TIBURÓN'},{n:57, nombre:'PATO'},{n:58, nombre:'HORMIGA'},
-    {n:59, nombre:'PANTERA'},{n:60, nombre:'CAMALEÓN'},{n:61, nombre:'PANDA'},{n:62, nombre:'CACHICAMO'},
-    {n:63, nombre:'CANGREJO'},{n:64, nombre:'GAVILÁN'},{n:65, nombre:'ARAÑA'},{n:66, nombre:'LOBO'},
-    {n:67, nombre:'AVESTRUZ'},{n:68, nombre:'JAGUAR'},{n:69, nombre:'CONEJO'},{n:70, nombre:'BISONTE'},
-    {n:71, nombre:'GUACAMAYA'},{n:72, nombre:'GORILA'},{n:73, nombre:'HIPOPÓTAMO'},{n:74, nombre:'TURPIAL'},
-    {n:75, nombre:'GUÁCHARO'}
-  ];
-
-  // Llenar el select de animalitos
   const selAnimal = document.getElementById('apuesta-animalito');
-  ANIMALITOS.forEach(a => {
+  ANIMALITOS.forEach((a, i) => {
     const opt = document.createElement('option');
-    opt.value = a.n;
-    opt.textContent = String(a.n).padStart(2,'0') + ' — ' + a.nombre;
+    opt.value = String(i);
+    opt.textContent = a.code + ' — ' + a.nombre;
     selAnimal.appendChild(opt);
   });
 
+  function llenarHorasDisponibles(){
+    const sel = document.getElementById('apuesta-hora');
+    const actual = sel.value;
+    const horas = horasDisponiblesHoy(nowColombia());
+    sel.innerHTML = '<option value="">Selecciona hora…</option>';
+    horas.forEach(h => {
+      const opt = document.createElement('option');
+      opt.value = h;
+      opt.textContent = h;
+      sel.appendChild(opt);
+    });
+    if (horas.includes(actual)) sel.value = actual;
+    return horas;
+  }
+
   const apostarModal = document.getElementById('apostar-modal');
+  const btnApostarSubmit = document.querySelector('#apostar-form .modal-submit');
+
+  function refrescarEstadoApuesta(){
+    const horas = llenarHorasDisponibles();
+    const lock = ventanaCierre(nowColombia());
+    const msg = document.getElementById('apuesta-msg');
+    if (lock.activo){
+      btnApostarSubmit.disabled = true;
+      btnApostarSubmit.style.opacity = '0.55';
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = 'Sorteo cerrado. Las apuestas se reanudan 5 minutos después de las ' + labelVE(lock.ve) + '.';
+    } else if (!horas.length){
+      btnApostarSubmit.disabled = true;
+      btnApostarSubmit.style.opacity = '0.55';
+      msg.style.color = 'var(--text-dim)';
+      msg.textContent = 'No hay sorteos disponibles por ahora. El próximo es mañana a las 08:00 a. m.';
+    } else {
+      btnApostarSubmit.disabled = false;
+      btnApostarSubmit.style.opacity = '1';
+      if (msg.textContent.includes('cerrado') || msg.textContent.includes('disponibles')) msg.textContent = '';
+    }
+  }
+
   document.getElementById('btn-jugar').addEventListener('click', async () => {
     const { data: { session } } = await sb.auth.getSession();
     if (!session){
@@ -1179,10 +1284,68 @@ cargarResultados();
       return;
     }
     apostarModal.classList.add('open');
+    refrescarEstadoApuesta();
     cargarMisApuestas();
+  });
+  document.getElementById('nav-apostar').addEventListener('click', () => {
+    mostrarVista('home');
+    document.getElementById('btn-jugar').click();
   });
   document.getElementById('apostar-close-btn').addEventListener('click', () => apostarModal.classList.remove('open'));
   apostarModal.addEventListener('click', (e) => { if (e.target === apostarModal) apostarModal.classList.remove('open'); });
+  setInterval(() => { if (apostarModal.classList.contains('open')) refrescarEstadoApuesta(); }, 1000);
+
+  function mostrarVista(nombre){
+    document.getElementById('vista-home').style.display = nombre === 'home' ? 'block' : 'none';
+    document.getElementById('vista-promos').style.display = nombre === 'promos' ? 'block' : 'none';
+    document.querySelectorAll('.bottomnav .navitem').forEach(el => el.classList.remove('active'));
+    if (nombre === 'promos') document.getElementById('nav-promos').classList.add('active');
+    else document.getElementById('nav-apostar').classList.add('active');
+    if (nombre === 'promos') cargarCanjes();
+  }
+
+  document.getElementById('nav-promos').addEventListener('click', () => mostrarVista('promos'));
+  document.getElementById('nav-perfil').addEventListener('click', () => {
+    mostrarVista('home');
+    document.getElementById('auth-logged-in').style.display !== 'none'
+      ? document.getElementById('cajero-pill').click()
+      : document.getElementById('btn-open-login').click();
+  });
+  document.getElementById('btn-ir-promos').addEventListener('click', () => mostrarVista('promos'));
+
+  async function cargarCanjes(){
+    const cont = document.getElementById('promo-historial');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ cont.innerHTML = '<div style="font-size:12px;color:var(--text-dim);">Entra a tu cuenta para redimir un código.</div>'; return; }
+    const { data } = await sb.from('canjes_promo').select('monto, creado_en').eq('user_id', session.user.id).order('creado_en', { ascending: false }).limit(8);
+    if (!data || !data.length){ cont.innerHTML = '<div style="font-size:12px;color:var(--text-dim);">Aún no has canjeado códigos.</div>'; return; }
+    cont.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px;">Tus canjes</div>' +
+      data.map(c => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line);font-size:13px;">
+        <span>+$${Number(c.monto).toLocaleString('es-CO')}</span>
+        <span style="color:var(--text-dim);">${new Date(c.creado_en).toLocaleDateString('es-CO')}</span>
+      </div>`).join('');
+  }
+
+  document.getElementById('form-codigo').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('promo-msg');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
+    const codigo = document.getElementById('promo-codigo').value.trim();
+    if (!codigo){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Escribe un código.'; return; }
+    msg.style.color = 'var(--text-dim)'; msg.textContent = 'Redimiendo…';
+    const { data, error } = await sb.rpc('redimir_codigo', { p_codigo: codigo });
+    if (error){
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = error.message.replace('ERROR: ','').replace(/.*exception: /i,'');
+      return;
+    }
+    msg.style.color = 'var(--gold)';
+    msg.textContent = 'Código redimido. Se acreditaron $' + Number(data).toLocaleString('es-CO');
+    document.getElementById('promo-codigo').value = '';
+    renderAuthState();
+    cargarCanjes();
+  });
 
   async function cargarMisApuestas(){
     const cont = document.getElementById('mis-apuestas');
@@ -1214,11 +1377,24 @@ cargarResultados();
     if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
 
     const hora = document.getElementById('apuesta-hora').value;
-    const numero = Number(document.getElementById('apuesta-animalito').value);
+    const idx = document.getElementById('apuesta-animalito').value;
     const monto = Number(document.getElementById('apuesta-monto').value);
-    const animal = ANIMALITOS.find(a => a.n === numero);
+    const animal = ANIMALITOS[Number(idx)];
+    const lock = ventanaCierre(nowColombia());
 
-    if (!hora || !animal || !monto || monto <= 0){
+    if (lock.activo){
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = 'Sorteo cerrado por 10 minutos. Intenta de nuevo en un momento.';
+      refrescarEstadoApuesta();
+      return;
+    }
+    if (!hora || !horasDisponiblesHoy(nowColombia()).includes(hora)){
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = 'Esa hora ya no está disponible.';
+      refrescarEstadoApuesta();
+      return;
+    }
+    if (!animal || !monto || monto <= 0){
       msg.style.color = 'var(--danger-ring)';
       msg.textContent = 'Completa todos los campos.';
       return;
@@ -1228,7 +1404,7 @@ cargarResultados();
     msg.textContent = 'Procesando…';
 
     const { data, error } = await sb.rpc('crear_apuesta', {
-      p_animalito_numero: numero,
+      p_animalito_numero: animal.n,
       p_animalito_nombre: animal.nombre,
       p_monto: monto,
       p_hora: hora

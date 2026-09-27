@@ -782,19 +782,39 @@
   <div class="modal-box">
     <button class="modal-close" id="recarga-close-btn">✕</button>
     <div class="modal-title display" style="font-size:15px;">RECARGAR SALDO</div>
-    <div style="font-size:12.5px;color:var(--text-dim);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:16px;">
-      Escribe el monto y una referencia. El saldo se actualiza cuando el administrador confirme la solicitud.
-    </div>
     <form id="recarga-form" class="auth-form">
-      <div class="modal-field">
-        <label>Monto (mínimo $2.000)</label>
-        <input type="number" id="recarga-monto" min="2000" step="500" required>
+      <div id="recarga-paso-1">
+        <div class="modal-field">
+          <label>¿Cuánto vas a recargar? (mínimo $2.000)</label>
+          <input type="number" id="recarga-monto" min="2000" step="500" required>
+        </div>
+        <button type="button" class="modal-submit" id="btn-recarga-continuar">Continuar</button>
       </div>
-      <div class="modal-field">
-        <label>Número de referencia</label>
-        <input type="text" id="recarga-referencia" required>
+      <div id="recarga-paso-2" style="display:none;">
+        <div style="font-size:13px;font-weight:800;margin-bottom:10px;">Envía <span id="recarga-monto-label" style="color:var(--gold);">$0</span> a:</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+          <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="font-weight:800;">Nequi</div>
+              <div style="font-size:13px;color:var(--gold);">301 325 4193</div>
+            </div>
+            <button type="button" class="btn-outline copiar-pago" data-copy="3013254193" style="padding:7px 10px;font-size:12px;width:auto;">Copiar</button>
+          </div>
+          <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="font-weight:800;">Bre-B</div>
+              <div style="font-size:13px;color:var(--gold);">301 325 4193</div>
+            </div>
+            <button type="button" class="btn-outline copiar-pago" data-copy="3013254193" style="padding:7px 10px;font-size:12px;width:auto;">Copiar</button>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label>Referencia (opcional)</label>
+          <input type="text" id="recarga-referencia" placeholder="Ej. hora del envío">
+        </div>
+        <button type="submit" class="modal-submit">Ya hice el pago</button>
+        <button type="button" class="btn-outline" id="btn-recarga-atras" style="width:100%;margin-top:8px;">Cambiar monto</button>
       </div>
-      <button type="submit" class="modal-submit">Enviar solicitud</button>
       <div class="modal-msg" id="recarga-msg"></div>
     </form>
     <div id="recarga-historial" style="margin-top:16px;"></div>
@@ -971,6 +991,23 @@
   <div class="navitem" data-view="home" id="nav-perfil">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" stroke="currentColor" stroke-width="1.6"/></svg>
     Perfil
+  </div>
+  <div class="navitem" id="nav-soporte">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+    Soporte
+  </div>
+</div>
+
+<div class="modal-overlay" id="soporte-modal">
+  <div class="modal-box" style="max-width:340px;">
+    <button class="modal-close" id="soporte-close">✕</button>
+    <div class="modal-title display" style="font-size:15px;">SOPORTE</div>
+    <p style="font-size:13.5px;color:var(--text-dim);margin:0 0 14px;">Escríbenos por WhatsApp.</p>
+    <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:800;color:var(--text-dim);">WHATSAPP</div>
+      <div style="font-size:20px;font-weight:800;color:var(--gold);margin-top:4px;">+58 422 030 4262</div>
+    </div>
+    <a class="modal-submit" href="https://wa.me/584220304262" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;">Abrir WhatsApp</a>
   </div>
 </div>
 
@@ -1438,6 +1475,36 @@ cargarCalientes();
       </div>`).join('');
   }
 
+  document.querySelectorAll('.copiar-pago').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy || '');
+        btn.textContent = 'Copiado';
+        setTimeout(() => { btn.textContent = 'Copiar'; }, 1400);
+      } catch (err) {
+        btn.textContent = '3013254193';
+      }
+    });
+  });
+
+  function mostrarPasoRecarga(paso){
+    document.getElementById('recarga-paso-1').style.display = paso === 1 ? 'block' : 'none';
+    document.getElementById('recarga-paso-2').style.display = paso === 2 ? 'block' : 'none';
+  }
+  document.getElementById('btn-recarga-continuar').addEventListener('click', () => {
+    const msg = document.getElementById('recarga-msg');
+    const monto = Number(document.getElementById('recarga-monto').value);
+    if (!monto || monto < 2000){
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = 'El monto mínimo de recarga es $2.000.';
+      return;
+    }
+    msg.textContent = '';
+    document.getElementById('recarga-monto-label').textContent = '$' + monto.toLocaleString('es-CO');
+    mostrarPasoRecarga(2);
+  });
+  document.getElementById('btn-recarga-atras').addEventListener('click', () => mostrarPasoRecarga(1));
+
   document.getElementById('recarga-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const msg = document.getElementById('recarga-msg');
@@ -1447,13 +1514,18 @@ cargarCalientes();
     if (!monto || monto < 2000){
       msg.style.color = 'var(--danger-ring)';
       msg.textContent = 'El monto mínimo de recarga es $2.000.';
+      mostrarPasoRecarga(1);
       return;
     }
-    const referencia = document.getElementById('recarga-referencia').value.trim();
+    const referencia = document.getElementById('recarga-referencia').value.trim() || 'Pago confirmado por el usuario';
     const { error } = await sb.from('recargas').insert({ user_id: session.user.id, monto, referencia });
     msg.style.color = error ? 'var(--danger-ring)' : 'var(--gold)';
-    msg.textContent = error ? 'No se pudo enviar la solicitud.' : 'Solicitud enviada. Te acreditamos al confirmar el pago.';
-    if (!error){ e.target.reset(); cargarHistorial('recargas', 'recarga-historial'); }
+    msg.textContent = error ? 'No se pudo enviar la solicitud.' : 'Solicitud enviada. El admin la confirmará.';
+    if (!error){
+      e.target.reset();
+      mostrarPasoRecarga(1);
+      cargarHistorial('recargas', 'recarga-historial');
+    }
   });
 
   document.getElementById('retiro-form').addEventListener('submit', async (e) => {
@@ -1677,6 +1749,9 @@ cargarCalientes();
     if (nombre === 'stats') cargarStatsVista();
   }
 
+  document.getElementById('nav-soporte').addEventListener('click', () => document.getElementById('soporte-modal').classList.add('open'));
+  document.getElementById('soporte-close').addEventListener('click', () => document.getElementById('soporte-modal').classList.remove('open'));
+  document.getElementById('soporte-modal').addEventListener('click', (e) => { if (e.target.id === 'soporte-modal') e.currentTarget.classList.remove('open'); });
   document.getElementById('nav-promos').addEventListener('click', () => mostrarVista('promos'));
   document.getElementById('nav-perfil').addEventListener('click', async () => {
     const { data: { session } } = await sb.auth.getSession();

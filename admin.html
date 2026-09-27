@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guácharo Activo — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{ --bg:#0b0620; --card:#161033; --card-2:#1c1440; --gold:#ffc233; --gold-2:#ffdd7a;
+    --text:#f4f1fb; --text-dim:#b8aed9; --line:rgba(168,140,255,0.18); --danger:#ff5f7a; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',system-ui,sans-serif;min-height:100vh;}
+  .display{font-family:'Archivo Black',system-ui,sans-serif;}
+  .wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px;}
+  h1{font-size:20px;letter-spacing:-0.01em;margin:0 0 4px;}
+  h3{margin:0 0 14px;font-size:15px;}
+  .sub{color:var(--text-dim);font-size:13px;margin:0 0 24px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px;}
+  label{display:block;font-size:12px;color:var(--text-dim);font-weight:700;margin-bottom:6px;}
+  input,select{width:100%;padding:11px 12px;border-radius:10px;background:var(--card-2);border:1px solid var(--line);
+    color:var(--text);font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px;}
+  button{cursor:pointer;font-family:inherit;border:none;border-radius:10px;padding:11px 16px;font-weight:800;font-size:13.5px;}
+  .btn-primary{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#241000;width:100%;}
+  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .btn-sm{padding:7px 12px;font-size:12px;}
+  .btn-ok{background:var(--gold);color:#241000;}
+  .btn-no{background:transparent;border:1px solid var(--danger);color:var(--danger);}
+  .msg{font-size:13px;font-weight:700;margin-top:10px;min-height:16px;}
+  .row{display:flex;gap:10px;align-items:center;justify-content:space-between;
+    background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px;cursor:pointer;}
+  .row:hover{border-color:var(--gold);}
+  #app{display:none;}
+  #topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .tag{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:6px;text-transform:uppercase;}
+  .tag-pendiente{background:rgba(184,174,217,.18);color:var(--text-dim);}
+  .tag-aprobada{background:rgba(255,194,51,.18);color:var(--gold);}
+  .tag-rechazada{background:rgba(255,95,122,.18);color:var(--danger);}
+  .back{background:none;border:none;color:var(--text-dim);font-weight:700;padding:0 0 14px;font-size:13px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="login-view">
+    <h1 class="display">GUÁCHARO ACTIVO</h1>
+    <p class="sub">Panel de administrador — acceso restringido</p>
+    <div class="card">
+      <label>Teléfono (admin)</label>
+      <input id="l-phone" type="tel" autocomplete="username" placeholder="301 325 4193">
+      <label>Contraseña</label>
+      <input id="l-pass" type="password" autocomplete="current-password">
+      <button class="btn-primary" id="btn-login">Entrar</button>
+      <div class="msg" id="login-msg"></div>
+    </div>
+  </div>
+
+  <div id="app">
+    <div id="topbar">
+      <div><h1 class="display" style="font-size:16px;">PANEL ADMINISTRADOR</h1>
+      <p class="sub" style="margin:2px 0 0;">Conectado como <span id="who"></span></p></div>
+      <button class="btn-outline" id="btn-logout">Cerrar sesión</button>
+    </div>
+
+    <div class="card">
+      <h3>Cargar resultado del sorteo</h3>
+      <label>Hora</label>
+      <input id="r-hora" placeholder="Ej. 09:00 p. m.">
+      <label>Animalito ganador</label>
+      <input id="r-animalito" placeholder="Ej. TIGRE" style="text-transform:uppercase;">
+      <label>Número (00-99)</label>
+      <input id="r-numero" type="number" min="0" max="99">
+      <button class="btn-primary" id="btn-resultado">Guardar resultado</button>
+      <div class="msg" id="resultado-msg"></div>
+    </div>
+
+    <!-- LISTA DE USUARIOS -->
+    <div class="card" id="vista-lista">
+      <h3>Usuarios</h3>
+      <label>Buscar por teléfono</label>
+      <input id="buscar-tel" placeholder="Ej. 0412">
+      <div id="usuarios-list"></div>
+    </div>
+
+    <!-- DETALLE DE UN USUARIO -->
+    <div class="card" id="vista-detalle" style="display:none;">
+      <button class="back" id="btn-volver">← Volver a usuarios</button>
+      <h3 id="det-nombre">—</h3>
+      <p class="sub" style="margin-top:-10px;">Tel. <span id="det-telefono"></span> · Registrado <span id="det-fecha"></span></p>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:12px;color:var(--text-dim);font-weight:700;">SALDO ACTUAL</span>
+        <span id="det-saldo" style="font-size:20px;font-weight:800;color:var(--gold);">$0</span>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:end;margin-bottom:20px;">
+        <div style="flex:1;"><label>Ajustar saldo manualmente</label><input id="det-ajuste" type="number" placeholder="Nuevo monto total"></div>
+        <button class="btn-outline btn-sm" id="btn-ajustar" style="margin-bottom:12px;">Guardar</button>
+      </div>
+      <div class="msg" id="ajuste-msg"></div>
+
+      <h3 style="margin-top:10px;">Solicitudes de recarga</h3>
+      <div id="det-recargas"></div>
+
+      <h3 style="margin-top:20px;">Solicitudes de retiro</h3>
+      <div id="det-retiros"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==== Completa esto con los datos de tu proyecto de Supabase ====
+const SUPABASE_URL = "https://jermqpozjczpjtfjkdbz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Implcm1xcG96amN6cGp0ZmprZGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMTg1MzksImV4cCI6MjEwNTY5NDUzOX0.cvtjdXVokAqXakZgmGQ2ps2v6Vtm7fiSwFkjzdHunm4";
+// Recuerda reemplazar también TU_ADMIN_UID_AQUI en el SQL
+// ==================================================================
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let usuarioActual = null; // { id, nombre, telefono, creado_en }
+
+const loginView = document.getElementById('login-view');
+const app = document.getElementById('app');
+
+async function checkSession(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (session){
+    loginView.style.display = 'none';
+    app.style.display = 'block';
+    document.getElementById('who').textContent = session.user.user_metadata?.telefono || session.user.email;
+    cargarUsuarios();
+  } else {
+    loginView.style.display = 'block';
+    app.style.display = 'none';
+  }
+}
+
+function telefonoAEmail(tel){
+  return tel.replace(/\D/g, '') + '@telefono.guacharoactivo.app';
+}
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const phone = document.getElementById('l-phone').value.trim();
+  const password = document.getElementById('l-pass').value;
+  const msg = document.getElementById('login-msg');
+  msg.style.color = 'var(--text-dim)'; msg.textContent = 'Entrando…';
+  const { error } = await sb.auth.signInWithPassword({ email: telefonoAEmail(phone), password });
+  if (error){ msg.style.color = 'var(--danger)'; msg.textContent = 'Teléfono o contraseña incorrectos.'; return; }
+  msg.textContent = '';
+  checkSession();
+});
+
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  checkSession();
+});
+
+/* -------- Resultados + liquidación automática -------- */
+document.getElementById('btn-resultado').addEventListener('click', async () => {
+  const msg = document.getElementById('resultado-msg');
+  const hora = document.getElementById('r-hora').value.trim();
+  const animalito = document.getElementById('r-animalito').value.trim().toUpperCase();
+  const numero = document.getElementById('r-numero').value;
+  if (!hora || !animalito || numero === ''){
+    msg.style.color = 'var(--danger)'; msg.textContent = 'Completa todos los campos.'; return;
+  }
+  const { data: last } = await sb.from('resultados').select('sorteo').order('sorteo', { ascending: false }).limit(1);
+  const sorteo = last && last.length ? last[0].sorteo + 1 : 4571;
+
+  // 1. Guardar el resultado
+  const { error } = await sb.from('resultados').insert({ sorteo, hora, animalito, numero: Number(numero) });
+  if (error){
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'No se pudo guardar: ' + error.message;
+    return;
+  }
+
+  // 2. Liquidar apuestas de esa hora (actualiza saldos de ganadores)
+  const { data: liquidadas, error: errLiq } = await sb.rpc('liquidar_sorteo', {
+    p_hora: hora,
+    p_numero: Number(numero),
+    p_animalito: animalito
+  });
+
+  if (errLiq){
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'Resultado guardado, pero falló la liquidación: ' + errLiq.message;
+  } else {
+    msg.style.color = 'var(--gold)';
+    msg.textContent = `Resultado publicado. Se liquidaron ${liquidadas ?? 0} apuestas.`;
+  }
+
+  document.getElementById('r-hora').value = '';
+  document.getElementById('r-animalito').value = '';
+  document.getElementById('r-numero').value = '';
+});
+
+/* -------- Lista de usuarios -------- */
+async function cargarUsuarios(){
+  const list = document.getElementById('usuarios-list');
+  const filtro = document.getElementById('buscar-tel').value.trim();
+  let q = sb.from('profiles').select('*').order('creado_en', { ascending: false }).limit(30);
+  if (filtro) q = q.ilike('telefono', '%' + filtro + '%');
+  const { data, error } = await q;
+  list.innerHTML = '';
+  if (error){ list.innerHTML = '<div class="msg" style="color:var(--danger)">' + error.message + '</div>'; return; }
+  if (!data.length){ list.innerHTML = '<div class="sub">Sin resultados.</div>'; return; }
+  data.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<span style="font-weight:700;">${p.nombre || 'Sin nombre'}</span><span style="color:var(--text-dim);">${p.telefono}</span>`;
+    row.addEventListener('click', () => abrirDetalle(p));
+    list.appendChild(row);
+  });
+}
+document.getElementById('buscar-tel').addEventListener('input', () => cargarUsuarios());
+
+document.getElementById('btn-volver').addEventListener('click', () => {
+  document.getElementById('vista-detalle').style.display = 'none';
+  document.getElementById('vista-lista').style.display = 'block';
+});
+
+/* -------- Detalle de usuario -------- */
+async function abrirDetalle(perfil){
+  usuarioActual = perfil;
+  document.getElementById('vista-lista').style.display = 'none';
+  document.getElementById('vista-detalle').style.display = 'block';
+  document.getElementById('det-nombre').textContent = perfil.nombre || 'Sin nombre';
+  document.getElementById('det-telefono').textContent = perfil.telefono;
+  document.getElementById('det-fecha').textContent = new Date(perfil.creado_en).toLocaleDateString('es-VE');
+  document.getElementById('ajuste-msg').textContent = '';
+  await refrescarDetalle();
+}
+
+async function refrescarDetalle(){
+  const { data: saldoRow } = await sb.from('saldos').select('saldo').eq('user_id', usuarioActual.id).maybeSingle();
+  document.getElementById('det-saldo').textContent = '$' + Number(saldoRow ? saldoRow.saldo : 0).toLocaleString('es-VE');
+
+  const { data: recargas } = await sb.from('recargas').select('*').eq('user_id', usuarioActual.id).order('creado_en', { ascending: false });
+  renderSolicitudes('det-recargas', recargas || [], 'recarga');
+
+  const { data: retiros } = await sb.from('retiros').select('*').eq('user_id', usuarioActual.id).order('creado_en', { ascending: false });
+  renderSolicitudes('det-retiros', retiros || [], 'retiro');
+}
+
+function renderSolicitudes(contId, items, tipo){
+  const cont = document.getElementById(contId);
+  if (!items.length){ cont.innerHTML = '<div class="sub">Sin solicitudes.</div>'; return; }
+  cont.innerHTML = '';
+  items.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.cursor = 'default';
+    const detalle = tipo === 'recarga' ? ('Ref: ' + (it.referencia || '—')) : (it.datos_pago || '—');
+    let acciones = `<span class="tag tag-${it.estado}">${it.estado}</span>`;
+    if (it.estado === 'pendiente'){
+      acciones = `<button class="btn-sm btn-ok" data-acc="aprobar" data-id="${it.id}" data-tipo="${tipo}">Aprobar</button>
+                  <button class="btn-sm btn-no" data-acc="rechazar" data-id="${it.id}" data-tipo="${tipo}">Rechazar</button>`;
+    }
+    row.innerHTML = `<div>
+        <div style="font-weight:800;">$${Number(it.monto).toLocaleString('es-VE')}</div>
+        <div style="font-size:11.5px;color:var(--text-dim);">${detalle}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">${acciones}</div>`;
+    cont.appendChild(row);
+  });
+  cont.querySelectorAll('button[data-acc]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const fn = (btn.dataset.acc === 'aprobar' ? 'aprobar_' : 'rechazar_') + btn.dataset.tipo;
+      const { error } = await sb.rpc(fn, { p_id: Number(btn.dataset.id) });
+      if (error) alert('No se pudo procesar: ' + error.message);
+      refrescarDetalle();
+    });
+  });
+}
+
+document.getElementById('btn-ajustar').addEventListener('click', async () => {
+  const msg = document.getElementById('ajuste-msg');
+  const monto = document.getElementById('det-ajuste').value;
+  if (monto === ''){ msg.style.color = 'var(--danger)'; msg.textContent = 'Escribe un monto.'; return; }
+  const { error } = await sb.from('saldos').upsert({ user_id: usuarioActual.id, saldo: Number(monto) });
+  msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
+  msg.textContent = error ? 'No se pudo guardar: ' + error.message : 'Saldo actualizado.';
+  if (!error){ document.getElementById('det-ajuste').value = ''; refrescarDetalle(); }
+});
+
+checkSession();
+</script>
+</body>
+</html>

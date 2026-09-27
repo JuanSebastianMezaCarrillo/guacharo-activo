@@ -2,827 +2,109 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Guácharo Activo</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guácharo Activo — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{
-    --bg: #0b0620;
-    --bg-2: #120a2e;
-    --card: #161033;
-    --card-2: #1c1440;
-    --purple-1: #6b21d8;
-    --purple-2: #8b3ff0;
-    --purple-glow: #a259ff;
-    --gold: #ffc233;
-    --gold-2: #ffdd7a;
-    --text: #f4f1fb;
-    --text-dim: #b8aed9;
-    --line: rgba(168,140,255,0.18);
-    --danger-ring: #ff5f7a;
-    --radius: 18px;
-    --radius-sm: 12px;
-  }
+  :root{ --bg:#0b0620; --card:#161033; --card-2:#1c1440; --gold:#ffc233; --gold-2:#ffdd7a;
+    --text:#f4f1fb; --text-dim:#b8aed9; --line:rgba(168,140,255,0.18); --danger:#ff5f7a; }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:
-      radial-gradient(1200px 600px at 15% -10%, rgba(139,63,240,0.25), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(255,194,51,0.08), transparent 55%),
-      var(--bg);
-    color:var(--text);
-    font-family:'Manrope', system-ui, sans-serif;
-    min-height:100vh;
-    -webkit-font-smoothing:antialiased;
-  }
-  .display{
-    font-family:'Archivo Black', system-ui, sans-serif;
-    letter-spacing:-0.01em;
-  }
-  a{color:inherit;text-decoration:none;}
-  button{font-family:inherit;cursor:pointer;}
-
-  .wrap{max-width:1180px;margin:0 auto;padding:20px 24px 90px;}
-
-  /* HEADER */
-  header{
-    display:flex;align-items:center;justify-content:space-between;gap:16px;
-    padding-bottom:22px;flex-wrap:wrap;
-  }
-  .brand{display:flex;align-items:center;gap:12px;}
-  .brand-mark{
-    width:52px;height:52px;border-radius:14px;
-    background:linear-gradient(155deg, var(--purple-1), #2a0f5c);
-    display:flex;align-items:center;justify-content:center;
-    box-shadow:0 0 0 1px var(--line), 0 8px 24px -8px rgba(139,63,240,0.6);
-    flex-shrink:0;
-  }
-  .brand-mark svg{width:30px;height:30px;}
-  .brand-text{line-height:1.05;}
-  .brand-text .n1{font-size:22px;letter-spacing:-0.02em;}
-  .brand-text .n2{font-size:13px;color:var(--gold);font-weight:800;letter-spacing:0.06em;}
-
-  .header-actions{display:flex;align-items:center;gap:12px;}
-  .pill{
-    display:flex;align-items:center;gap:10px;
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:9px 16px;
-  }
-  .pill .ic{
-    width:34px;height:34px;border-radius:10px;
-    background:rgba(139,63,240,0.18);
-    display:flex;align-items:center;justify-content:center;
-    color:var(--purple-glow);
-    flex-shrink:0;
-  }
-  .pill .label{font-size:11px;color:var(--text-dim);font-weight:600;}
-  .pill .value{font-size:16px;font-weight:800;}
-  .pill.clickable{transition:border-color .15s ease, transform .15s ease;}
-  .pill.clickable:hover{border-color:var(--purple-glow);transform:translateY(-1px);}
-  .chev{color:var(--text-dim);margin-left:2px;}
-
-  /* HERO */
-  .hero{
-    position:relative;
-    border-radius:24px;
-    overflow:hidden;
-    background:
-      radial-gradient(700px 380px at 88% 40%, rgba(139,63,240,0.55), transparent 65%),
-      linear-gradient(120deg, #150a38 0%, #1c0e46 55%, #240f52 100%);
-    border:1px solid var(--line);
-    padding:44px 40px;
-    min-height:300px;
-    display:flex;
-    align-items:center;
-  }
-  .hero::after{
-    content:"";
-    position:absolute; inset:0;
-    background-image:
-      repeating-linear-gradient(115deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 44px);
-    pointer-events:none;
-  }
-  .hero-content{position:relative;z-index:2;max-width:560px;}
-  .hero-content h1{
-    margin:0;
-    font-size:44px;
-    line-height:1.05;
-    text-transform:uppercase;
-  }
-  .hero-content h1 .accent{
-    color:var(--gold);
-    -webkit-text-stroke:0;
-  }
-  .hero-content p{
-    margin:14px 0 26px;
-    color:var(--text-dim);
-    font-size:15px;
-    font-weight:600;
-    max-width:400px;
-  }
-  .cta{
-    display:inline-flex;align-items:center;gap:10px;
-    background:linear-gradient(180deg, var(--gold-2), var(--gold));
-    color:#241000;
-    font-weight:800;
-    padding:15px 26px;
-    border-radius:999px;
-    border:none;
-    font-size:15px;
-    box-shadow:0 10px 26px -8px rgba(255,194,51,0.55);
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .cta:hover{transform:translateY(-2px);box-shadow:0 14px 30px -8px rgba(255,194,51,0.7);}
-  .hero-orb{
-    position:absolute;
-    right:-40px; top:50%; transform:translateY(-50%);
-    width:420px; height:420px;
-    z-index:1;
-    opacity:0.95;
-  }
-  .ball{
-    position:absolute;
-    border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Archivo Black', sans-serif;
-    color:#241a4a;
-    background:
-      radial-gradient(circle at 32% 28%, #fff 0%, #e9e3ff 22%, #c9b8ff 55%, #a684ff 100%);
-    box-shadow: inset 0 -8px 14px rgba(90,40,180,0.35), 0 10px 22px -6px rgba(0,0,0,0.5);
-  }
-  .ball.b1{width:78px;height:78px;font-size:26px;top:6%;left:38%;}
-  .ball.b2{width:96px;height:96px;font-size:32px;top:52%;left:56%;}
-  .ball.b3{width:70px;height:70px;font-size:24px;top:14%;right:2%;}
-
-  /* GRID */
-  .grid2{
-    display:grid;
-    grid-template-columns: 1.05fr 1.3fr;
-    gap:20px;
-    margin-top:20px;
-  }
-  @media (max-width: 860px){ .grid2{grid-template-columns:1fr;} }
-
-  .card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:22px 22px 24px;
-  }
-  .card-head{
-    display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:16px;
-  }
-  .card-title{
-    display:flex;align-items:center;gap:10px;
-    font-size:15px;font-weight:800;
-  }
-  .card-title .ic{
-    width:32px;height:32px;border-radius:9px;
-    display:flex;align-items:center;justify-content:center;
-    background:rgba(139,63,240,0.18);
-    color:var(--purple-glow);
-    flex-shrink:0;
-  }
-  .card-title .ic.fire{background:rgba(255,194,51,0.15);color:var(--gold);}
-  .link-more{font-size:13px;font-weight:700;color:var(--purple-glow);}
-  .badge{
-    background:rgba(139,63,240,0.22);
-    color:#d8c4ff;
-    font-size:11px;font-weight:800;
-    padding:5px 10px;border-radius:999px;
-  }
-
-  /* countdown */
-  .countdown-label{font-size:13px;color:var(--text-dim);font-weight:700;margin-bottom:10px;}
-  .countdown{
-    display:grid;grid-template-columns:repeat(3,1fr);
-    gap:10px;margin-bottom:14px;
-  }
-  .cbox{
-    background:var(--bg-2);
-    border:1px solid var(--line);
-    border-radius:var(--radius-sm);
-    text-align:center;
-    padding:14px 6px 10px;
-  }
-  .cbox .num{
-    font-family:'Archivo Black',sans-serif;
-    font-size:30px;
-    font-variant-numeric: tabular-nums;
-    color:var(--gold);
-  }
-  .cbox.urgent .num{color:var(--danger-ring);}
-  .cbox .lab{font-size:11px;color:var(--text-dim);font-weight:700;margin-top:2px;}
-  .sep{display:none;}
-  .meta-row{
-    display:flex;align-items:center;justify-content:space-between;
-    font-size:13px;color:var(--text-dim);font-weight:600;
-    padding-top:12px;border-top:1px solid var(--line);
-    flex-wrap:wrap;gap:8px;
-  }
-  .meta-row .when{display:flex;align-items:center;gap:6px;color:var(--text);font-weight:700;}
-  .tag-all{
-    background:rgba(139,63,240,0.18);
-    padding:8px 12px;border-radius:12px;
-    text-align:center;font-size:12px;font-weight:700;color:#d8c4ff;
-    line-height:1.3;
-  }
-
-  /* hot numbers */
-  .hot-sub{font-size:13px;color:var(--text-dim);font-weight:600;margin:-8px 0 14px;}
-  .hot-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-  .hot-ball{
-    aspect-ratio:1/1;
-    border-radius:50%;
-    background:linear-gradient(160deg, var(--card-2), #241a4a);
-    border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Archivo Black',sans-serif;
-    font-size:17px;
-  }
-
-  /* results */
-  .results-head{
-    display:flex;align-items:center;justify-content:space-between;
-    margin:28px 0 14px;
-  }
-  .section-title{
-    display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;
-  }
-  .section-title .ic{
-    width:34px;height:34px;border-radius:10px;
-    background:rgba(139,63,240,0.18);color:var(--purple-glow);
-    display:flex;align-items:center;justify-content:center;
-  }
-  .results-grid{
-    display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
-  }
-  @media (max-width:860px){.results-grid{grid-template-columns:repeat(2,1fr);}}
-  @media (max-width:520px){.results-grid{grid-template-columns:1fr;}}
-  .result-card{
-    background:var(--card);border:1px solid var(--line);
-    border-radius:var(--radius-sm);padding:16px;
-  }
-  .result-top{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-  .result-top .ic{
-    width:30px;height:30px;border-radius:9px;
-    background:rgba(139,63,240,0.2);
-    display:flex;align-items:center;justify-content:center;color:var(--purple-glow);
-    flex-shrink:0;
-  }
-  .result-top .rn{font-size:13px;font-weight:800;}
-  .result-top .rt{font-size:11px;color:var(--text-dim);font-weight:600;}
-  .result-balls{display:flex;gap:8px;flex-wrap:wrap;}
-  .rball{
-    width:34px;height:34px;border-radius:50%;
-    background:linear-gradient(160deg, var(--card-2), #241a4a);
-    border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;
-    font-size:12px;font-weight:800;
-  }
-
-  /* games */
-  .games-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;}
-  @media (max-width:760px){.games-grid{grid-template-columns:1fr;}}
-  .game-card{
-    background:var(--card);border:1px solid var(--line);
-    border-radius:var(--radius-sm);padding:20px;
-    transition:border-color .15s ease, transform .15s ease;
-    display:block;
-  }
-  .game-card:hover{border-color:var(--purple-glow);transform:translateY(-2px);}
-  .game-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;}
-  .game-ic{
-    width:42px;height:42px;border-radius:12px;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .game-ic.star{background:#e0a415;color:#241a02;}
-  .game-ic.heart{background:var(--purple-1);color:#fff;}
-  .game-ic.chart{background:var(--purple-1);color:#fff;}
-  .game-arrow{
-    width:32px;height:32px;border-radius:50%;
-    background:rgba(139,63,240,0.18);
-    display:flex;align-items:center;justify-content:center;color:var(--purple-glow);
-  }
-  .game-card h3{margin:0 0 4px;font-size:16px;}
-  .game-card p{margin:0;font-size:13px;color:var(--text-dim);font-weight:600;}
-
-  /* promo strip */
-  .promo{
-    margin-top:18px;
-    background:linear-gradient(120deg, var(--card), var(--card-2));
-    border:1px solid var(--line);
-    border-radius:var(--radius-sm);
-    padding:18px 22px;
-    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
-  }
-  .promo-left{display:flex;align-items:center;gap:14px;}
-  .promo-ic{
-    width:44px;height:44px;border-radius:12px;
-    background:rgba(255,194,51,0.15);color:var(--gold);
-    display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  }
-  .promo h4{margin:0 0 3px;font-size:15px;}
-  .promo p{margin:0;font-size:13px;color:var(--text-dim);font-weight:600;}
-  .btn-outline{
-    background:linear-gradient(180deg, var(--purple-2), var(--purple-1));
-    color:#fff;font-weight:800;font-size:13px;
-    padding:12px 18px;border-radius:12px;border:none;
-    display:flex;align-items:center;gap:8px;white-space:nowrap;
-  }
-
-  /* bottom nav (mobile-style, matches reference) */
-  .bottomnav{
-    position:fixed;left:0;right:0;bottom:0;
-    background:rgba(11,6,32,0.92);
-    backdrop-filter:blur(10px);
-    border-top:1px solid var(--line);
-    display:flex;justify-content:space-around;
-    padding:10px 10px 14px;
-    z-index:50;
-  }
-  .navitem{
-    display:flex;flex-direction:column;align-items:center;gap:4px;
-    font-size:11px;font-weight:700;color:var(--text-dim);
-    position:relative;padding:4px 14px;
-  }
-  .navitem.active{color:var(--text);}
-  .navitem.active::after{
-    content:"";position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
-    width:26px;height:3px;border-radius:3px;
-    background:linear-gradient(90deg, var(--purple-2), var(--gold));
-  }
-
-  .demo-flag{
-    text-align:center;font-size:12px;color:var(--text-dim);
-    padding:14px 20px 0;font-weight:600;
-  }
-  .demo-flag b{color:var(--gold);}
-
-  /* AUTH BUTTONS + CAJERO */
-  .auth-btns{display:flex;align-items:center;gap:8px;}
-  .btn-auth{
-    padding:10px 18px;border-radius:12px;border:1px solid var(--line);
-    font-weight:800;font-size:13px;background:transparent;color:var(--text);
-    transition:border-color .15s ease, transform .15s ease;white-space:nowrap;
-  }
-  .btn-auth:hover{border-color:var(--purple-glow);transform:translateY(-1px);}
-  .btn-auth.primary{
-    background:linear-gradient(180deg, var(--purple-2), var(--purple-1));
-    border:none;color:#fff;
-  }
-  #auth-logged-in{cursor:pointer;}
-
-  /* AUTH MODAL */
-  .modal-overlay{
-    position:fixed;inset:0;background:rgba(5,2,15,0.72);
-    display:none;align-items:center;justify-content:center;
-    z-index:200;padding:20px;
-  }
-  .modal-overlay.open{display:flex;}
-  .modal-box{
-    background:var(--card);border:1px solid var(--line);
-    border-radius:var(--radius);padding:26px;width:100%;max-width:380px;
-    position:relative;
-  }
-  .modal-close{
-    position:absolute;top:14px;right:14px;
-    width:30px;height:30px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    background:var(--bg-2);color:var(--text-dim);border:none;font-size:14px;
-  }
-  .modal-title{font-size:16px;font-weight:800;margin:0 0 18px;}
-  .modal-tabs{display:flex;gap:6px;margin-bottom:18px;background:var(--bg-2);padding:4px;border-radius:12px;}
-  .modal-tab{flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:800;color:var(--text-dim);}
-  .modal-tab.active{background:linear-gradient(180deg, var(--purple-2), var(--purple-1));color:#fff;}
-  .modal-field{margin-bottom:12px;}
-  .modal-field label{display:block;font-size:12px;color:var(--text-dim);font-weight:700;margin-bottom:6px;}
-  .modal-field input{
-    width:100%;background:var(--bg-2);border:1px solid var(--line);color:var(--text);
-    border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;
-  }
-  .modal-submit{
-    width:100%;margin-top:6px;
-    background:linear-gradient(180deg, var(--gold-2), var(--gold));
-    color:#241000;font-weight:800;padding:13px;border-radius:12px;border:none;font-size:14px;
-  }
-  .modal-msg{font-size:12px;font-weight:700;margin-top:10px;text-align:center;min-height:16px;}
-
-  @media (max-width:600px){
-    .wrap{padding:14px 12px 96px;}
-
-    header{gap:10px;padding-bottom:16px;}
-    .brand-mark{width:44px;height:44px;border-radius:12px;}
-    .brand-mark svg{width:24px;height:24px;}
-    .brand-text .n1{font-size:19px;}
-    .brand-text .n2{font-size:11px;}
-
-    .header-actions{width:100%;gap:8px;}
-    .pill{padding:7px 10px;border-radius:12px;flex:1 1 auto;min-width:0;}
-    .pill .ic{width:28px;height:28px;border-radius:8px;}
-    .pill .label{font-size:9.5px;}
-    .pill .value{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-    .auth-btns{width:100%;gap:8px;}
-    .btn-auth{flex:1;padding:11px 10px;font-size:12.5px;text-align:center;}
-
-    .hero{padding:26px 18px;min-height:220px;border-radius:20px;}
-    .hero-content h1{font-size:28px;}
-    .hero-content p{font-size:13.5px;margin:10px 0 20px;}
-    .cta{padding:13px 22px;font-size:14px;width:100%;justify-content:center;}
-    .hero-orb{display:none;}
-
-    .card{padding:18px 16px 20px;border-radius:14px;}
-    .card-title{font-size:13.5px;}
-    .cbox{padding:12px 4px 8px;}
-    .cbox .num{font-size:24px;}
-    .hot-grid{grid-template-columns:repeat(5,1fr);gap:7px;}
-    .hot-ball{font-size:14px;}
-    .meta-row{font-size:12px;}
-
-    .section-title{font-size:14.5px;}
-    .promo{flex-direction:column;align-items:stretch;text-align:left;padding:16px;}
-    .btn-outline{justify-content:center;width:100%;}
-
-    .bottomnav{padding:10px 6px calc(12px + env(safe-area-inset-bottom, 0px));}
-    .navitem{padding:4px 8px;font-size:10.5px;}
-
-    .modal-box{padding:20px 18px;border-radius:16px;}
-  }
-
-  @media (max-width:380px){
-    .hero-content h1{font-size:24px;}
-    .header-actions{flex-wrap:wrap;}
-    .pill{flex:1 1 44%;}
-  }
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',system-ui,sans-serif;min-height:100vh;}
+  .display{font-family:'Archivo Black',system-ui,sans-serif;}
+  .wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px;}
+  h1{font-size:20px;letter-spacing:-0.01em;margin:0 0 4px;}
+  h3{margin:0 0 14px;font-size:15px;}
+  .sub{color:var(--text-dim);font-size:13px;margin:0 0 24px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px;}
+  label{display:block;font-size:12px;color:var(--text-dim);font-weight:700;margin-bottom:6px;}
+  input,select{width:100%;padding:11px 12px;border-radius:10px;background:var(--card-2);border:1px solid var(--line);
+    color:var(--text);font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px;}
+  button{cursor:pointer;font-family:inherit;border:none;border-radius:10px;padding:11px 16px;font-weight:800;font-size:13.5px;}
+  .btn-primary{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#241000;width:100%;}
+  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .btn-sm{padding:7px 12px;font-size:12px;}
+  .btn-ok{background:var(--gold);color:#241000;}
+  .btn-no{background:transparent;border:1px solid var(--danger);color:var(--danger);}
+  .msg{font-size:13px;font-weight:700;margin-top:10px;min-height:16px;}
+  .row{display:flex;gap:10px;align-items:center;justify-content:space-between;
+    background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px;cursor:pointer;}
+  .row:hover{border-color:var(--gold);}
+  #app{display:none;}
+  #topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .tag{font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:6px;text-transform:uppercase;}
+  .tag-pendiente{background:rgba(184,174,217,.18);color:var(--text-dim);}
+  .tag-aprobada{background:rgba(255,194,51,.18);color:var(--gold);}
+  .tag-rechazada{background:rgba(255,95,122,.18);color:var(--danger);}
+  .back{background:none;border:none;color:var(--text-dim);font-weight:700;padding:0 0 14px;font-size:13px;}
 </style>
 </head>
 <body>
-
 <div class="wrap">
 
-  <header>
-    <div class="brand">
-      <div class="brand-mark">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L4 9l1.5 1 1-1.4V19a1 1 0 001 1h9a1 1 0 001-1V8.6l1 1.4L20 9 12 2z" fill="#ffc233"/>
-        </svg>
-      </div>
-      <div class="brand-text">
-        <div class="n1 display">Guácharo</div>
-        <div class="n2 display">ACTIVO</div>
-      </div>
-    </div>
-
-    <div class="header-actions">
-      <div class="pill" id="mode-flag">
-        <div class="ic">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" fill="currentColor"/></svg>
-        </div>
-        <div class="value">Vista pública</div>
-      </div>
-
-      <!-- CAJERO -->
-      <div class="pill clickable" id="cajero-pill" title="Tu saldo" style="display:none;">
-        <div class="ic">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 012-2h13a2 2 0 012 2v1H3V7zm0 3h18v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7zm13 3.5a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0z" fill="currentColor"/></svg>
-        </div>
-        <div>
-          <div class="label">Cajero</div>
-          <div class="value" id="cajero-value">$0</div>
-        </div>
-      </div>
-
-      <!-- ENTRAR / REGISTRARSE -->
-      <div class="auth-btns" id="auth-logged-out">
-        <button class="btn-auth" id="btn-open-login">Entrar</button>
-        <button class="btn-auth primary" id="btn-open-register">Registrarse</button>
-      </div>
-
-      <!-- USUARIO (cuando ya inició sesión) -->
-      <div class="pill clickable" id="auth-logged-in" style="display:none;" title="Clic para cerrar sesión">
-        <div class="ic">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" fill="currentColor"/></svg>
-        </div>
-        <div>
-          <div class="label">Hola</div>
-          <div class="value" id="user-name-value">Usuario</div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1 class="display">Juega la<br>lotería<br><span class="accent">Guácharo</span></h1>
-      <p>¡Y haz tus sueños realidad! Elige tus números favoritos y participa en el próximo sorteo.</p>
-      <button class="cta" id="btn-jugar">Juega ahora <span>›</span></button>
-    </div>
-    <div class="hero-orb" aria-hidden="true">
-      <div class="ball b1">27</div>
-      <div class="ball b2">05</div>
-      <div class="ball b3">16</div>
-    </div>
-  </section>
-
-  <!-- MAIN GRID -->
-  <div class="grid2">
-
-    <!-- COUNTDOWN CARD -->
+  <div id="login-view">
+    <h1 class="display">GUÁCHARO ACTIVO</h1>
+    <p class="sub">Panel de administrador — acceso restringido</p>
     <div class="card">
-      <div class="card-head">
-        <div class="card-title">
-          <div class="ic">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7 2v2M17 2v2M3 8h18M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          </div>
-          <span>PRÓXIMO SORTEO</span>
-        </div>
-        <span class="badge" id="draw-number">#4582</span>
-      </div>
+      <label>Teléfono (admin)</label>
+      <input id="l-phone" type="tel" autocomplete="username" placeholder="301 325 4193">
+      <label>Contraseña</label>
+      <input id="l-pass" type="password" autocomplete="current-password">
+      <button class="btn-primary" id="btn-login">Entrar</button>
+      <div class="msg" id="login-msg"></div>
+    </div>
+  </div>
 
-      <div class="countdown-label">Sorteo en:</div>
-      <div class="countdown">
-        <div class="cbox" id="box-h"><div class="num" id="cd-h">00</div><div class="lab">Horas</div></div>
-        <div class="cbox" id="box-m"><div class="num" id="cd-m">34</div><div class="lab">Minutos</div></div>
-        <div class="cbox urgent" id="box-s"><div class="num" id="cd-s">27</div><div class="lab">Segundos</div></div>
-      </div>
-
-      <div class="meta-row">
-        <div class="when">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 8v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8"/></svg>
-          <span id="next-draw-label">Hoy · 10:00 p. m.</span>
-        </div>
-        <div class="tag-all">Todos los días<br>13 sorteos</div>
-      </div>
+  <div id="app">
+    <div id="topbar">
+      <div><h1 class="display" style="font-size:16px;">PANEL ADMINISTRADOR</h1>
+      <p class="sub" style="margin:2px 0 0;">Conectado como <span id="who"></span></p></div>
+      <button class="btn-outline" id="btn-logout">Cerrar sesión</button>
     </div>
 
-    <!-- HOT NUMBERS CARD -->
     <div class="card">
-      <div class="card-head">
-        <div class="card-title">
-          <div class="ic fire">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2c1 3-3 4-3 8a3 3 0 006 0c1.5 1 2 3 2 4.5A5.5 5.5 0 016.5 20 6.5 6.5 0 018 8c0 2 1 1 1-1 0-2-1-3 3-5z" fill="currentColor"/></svg>
-          </div>
-          <span>NÚMEROS CALIENTES</span>
-        </div>
-        <a class="link-more" href="#">Ver todos</a>
-      </div>
-      <div class="hot-sub">Los más jugados en las últimas 24 horas</div>
-      <div class="hot-grid">
-        <div class="hot-ball">05</div>
-        <div class="hot-ball">16</div>
-        <div class="hot-ball">27</div>
-        <div class="hot-ball">32</div>
-        <div class="hot-ball">41</div>
-        <div class="hot-ball">06</div>
-        <div class="hot-ball">11</div>
-        <div class="hot-ball">18</div>
-        <div class="hot-ball">24</div>
-        <div class="hot-ball">37</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RESULTS -->
-  <div class="results-head">
-    <div class="section-title">
-      <div class="ic">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6M5 15a8 8 0 0013.86 3.36M19 9A8 8 0 005.14 5.64" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      </div>
-      <span>RESULTADOS RECIENTES</span>
-    </div>
-    <a class="link-more" href="#">Ver historial ›</a>
-  </div>
-
-  <div class="results-grid" id="results-grid"></div>
-
-  <!-- GAMES -->
-  <div class="results-head" style="margin-top:34px;">
-    <div class="section-title">
-      <div class="ic">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M6 9h4M8 7v4M15 10h.01M18 8h.01M2 12l1.6-5.4A3 3 0 016.5 4.5h11A3 3 0 0120.4 6.6L22 12l-1.5 6a2 2 0 01-3.6.7L15 15H9l-1.9 3.7A2 2 0 013.5 18L2 12z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-      </div>
-      <span>JUEGOS Y APUESTAS</span>
-    </div>
-    <a class="link-more" href="#">Todos los juegos ›</a>
-  </div>
-
-  <div class="games-grid">
-    <a class="game-card" href="#">
-      <div class="game-top">
-        <div class="game-ic star">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 16.9 5.8 20.3l1.6-6.8L2.2 8.9l6.9-.6z"/></svg>
-        </div>
-        <div class="game-arrow">›</div>
-      </div>
-      <h3>Números Calientes</h3>
-      <p>Descubre los más probables de hoy</p>
-    </a>
-    <a class="game-card" href="#">
-      <div class="game-top">
-        <div class="game-ic heart">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.5-9C.7 8.3 2.5 5 6 5c2 0 3.5 1.1 4 2.4C10.5 6.1 12 5 14 5c3.5 0 5.3 3.3 3.5 7-2.5 4.4-9.5 9-9.5 9z"/></svg>
-        </div>
-        <div class="game-arrow">›</div>
-      </div>
-      <h3>Favoritos</h3>
-      <p>Tus números guardados</p>
-    </a>
-    <a class="game-card" href="#">
-      <div class="game-top">
-        <div class="game-ic chart">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
-        </div>
-        <div class="game-arrow">›</div>
-      </div>
-      <h3>Análisis y Estadísticas</h3>
-      <p>Historial, tendencias y más</p>
-    </a>
-  </div>
-
-  <!-- PROMO -->
-  <div class="promo">
-    <div class="promo-left">
-      <div class="promo-ic">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16L3 6l5 4 4-6 4 6 5-4-2 10H5zm0 2h14v2H5z"/></svg>
-      </div>
-      <div>
-        <h4>¡Tus números favoritos, más cerca del premio!</h4>
-        <p>Guarda tus números y recibe notificaciones cuando salgan.</p>
-      </div>
-    </div>
-    <button class="btn-outline">+ Agregar favoritos</button>
-  </div>
-
-  <div class="demo-flag">Demo con fines ilustrativos · <b>no procesa dinero real</b> · horarios de sorteo aproximados</div>
-
-</div>
-
-<!-- MODAL ENTRAR / REGISTRARSE -->
-<div class="modal-overlay" id="auth-modal">
-  <div class="modal-box">
-    <button class="modal-close" id="modal-close-btn">✕</button>
-    <div class="modal-title display" style="font-size:15px;">ACCEDE A TU CUENTA</div>
-    <div class="modal-tabs">
-      <div class="modal-tab active" data-tab="login">Entrar</div>
-      <div class="modal-tab" data-tab="register">Registrarse</div>
+      <h3>Cargar resultado del sorteo</h3>
+      <label>Hora</label>
+      <input id="r-hora" placeholder="Ej. 09:00 p. m.">
+      <label>Animalito ganador</label>
+      <input id="r-animalito" placeholder="Ej. TIGRE" style="text-transform:uppercase;">
+      <label>Número (00-99)</label>
+      <input id="r-numero" type="number" min="0" max="99">
+      <button class="btn-primary" id="btn-resultado">Guardar resultado</button>
+      <div class="msg" id="resultado-msg"></div>
     </div>
 
-    <form id="login-form" class="auth-form">
-      <div class="modal-field">
-        <label>Teléfono</label>
-        <input type="tel" id="login-user" autocomplete="username" placeholder="300 123 4567" required>
-      </div>
-      <div class="modal-field">
-        <label>Contraseña</label>
-        <input type="password" id="login-pass" autocomplete="current-password" required>
-      </div>
-      <button type="submit" class="modal-submit">Entrar</button>
-      <div class="modal-msg" id="login-msg"></div>
-      <div style="text-align:center;margin-top:10px;">
-        <span style="font-size:12px;color:var(--text-dim);">¿Olvidaste tu contraseña? Escríbele al administrador para que te ayude a restablecerla.</span>
-      </div>
-    </form>
-
-    <form id="register-form" class="auth-form" style="display:none;">
-      <div class="modal-field">
-        <label>Nombre</label>
-        <input type="text" id="reg-name" required>
-      </div>
-      <div class="modal-field">
-        <label>Teléfono</label>
-        <input type="tel" id="reg-user" autocomplete="username" placeholder="300 123 4567" required>
-      </div>
-      <div class="modal-field">
-        <label>Contraseña</label>
-        <input type="password" id="reg-pass" autocomplete="new-password" required minlength="6">
-      </div>
-      <button type="submit" class="modal-submit">Crear cuenta</button>
-      <div class="modal-msg" id="register-msg"></div>
-    </form>
-  </div>
-</div>
-
-<!-- MENÚ CAJERO -->
-<div class="modal-overlay" id="cajero-modal">
-  <div class="modal-box" style="max-width:320px;">
-    <button class="modal-close" id="cajero-menu-close">✕</button>
-    <div class="modal-title display" style="font-size:15px;">TU CAJERO</div>
-    <div style="text-align:center;font-size:28px;font-weight:800;color:var(--gold);margin:10px 0 20px;" id="cajero-menu-saldo">$0</div>
-    <button type="button" class="modal-submit" id="btn-open-recarga" style="margin-bottom:10px;">Recargar saldo</button>
-    <button type="button" class="modal-submit" id="btn-open-retiro" style="background:transparent;border:1px solid var(--line);color:var(--text);">Retirar saldo</button>
-  </div>
-</div>
-
-<!-- MODAL RECARGAR -->
-<div class="modal-overlay" id="recarga-modal">
-  <div class="modal-box">
-    <button class="modal-close" id="recarga-close-btn">✕</button>
-    <div class="modal-title display" style="font-size:15px;">RECARGAR SALDO</div>
-    <div style="font-size:12.5px;color:var(--text-dim);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:16px;">
-      <b style="color:var(--gold);">DEMO</b> — Esta es una solicitud ficticia. Escribe cualquier monto y una referencia inventada. El administrador (tú) la aprobará o rechazará desde el panel y el saldo se actualizará automáticamente.
+    <!-- LISTA DE USUARIOS -->
+    <div class="card" id="vista-lista">
+      <h3>Usuarios</h3>
+      <label>Buscar por teléfono</label>
+      <input id="buscar-tel" placeholder="Ej. 0412">
+      <div id="usuarios-list"></div>
     </div>
-    <form id="recarga-form" class="auth-form">
-      <div class="modal-field">
-        <label>Monto</label>
-        <input type="number" id="recarga-monto" min="1" step="0.01" required>
-      </div>
-      <div class="modal-field">
-        <label>Número de referencia</label>
-        <input type="text" id="recarga-referencia" required>
-      </div>
-      <button type="submit" class="modal-submit">Enviar solicitud</button>
-      <div class="modal-msg" id="recarga-msg"></div>
-    </form>
-    <div id="recarga-historial" style="margin-top:16px;"></div>
-  </div>
-</div>
 
-<!-- MODAL RETIRAR -->
-<div class="modal-overlay" id="retiro-modal">
-  <div class="modal-box">
-    <button class="modal-close" id="retiro-close-btn">✕</button>
-    <div class="modal-title display" style="font-size:15px;">RETIRAR SALDO</div>
-    <form id="retiro-form" class="auth-form">
-      <div class="modal-field">
-        <label>Monto</label>
-        <input type="number" id="retiro-monto" min="1" step="0.01" required>
-      </div>
-      <div class="modal-field">
-        <label>Dónde recibir el pago (Nequi, Bancolombia, etc.)</label>
-        <input type="text" id="retiro-datos" placeholder="Ej. Nequi 300-1234567, Bancolombia" required>
-      </div>
-      <button type="submit" class="modal-submit">Enviar solicitud</button>
-      <div class="modal-msg" id="retiro-msg"></div>
-    </form>
-    <div id="retiro-historial" style="margin-top:16px;"></div>
-  </div>
-</div>
+    <!-- DETALLE DE UN USUARIO -->
+    <div class="card" id="vista-detalle" style="display:none;">
+      <button class="back" id="btn-volver">← Volver a usuarios</button>
+      <h3 id="det-nombre">—</h3>
+      <p class="sub" style="margin-top:-10px;">Tel. <span id="det-telefono"></span> · Registrado <span id="det-fecha"></span></p>
 
-<!-- MODAL APOSTAR -->
-<div class="modal-overlay" id="apostar-modal">
-  <div class="modal-box" style="max-width:420px;">
-    <button class="modal-close" id="apostar-close-btn">✕</button>
-    <div class="modal-title display" style="font-size:15px;">HACER UNA APUESTA</div>
-    <div style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">
-      Elige la hora del sorteo, el animalito y el monto. Se descuenta de tu saldo al confirmar.
-      Premio: <b style="color:var(--gold);">x60</b> lo apostado.
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:12px;color:var(--text-dim);font-weight:700;">SALDO ACTUAL</span>
+        <span id="det-saldo" style="font-size:20px;font-weight:800;color:var(--gold);">$0</span>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:end;margin-bottom:20px;">
+        <div style="flex:1;"><label>Ajustar saldo manualmente</label><input id="det-ajuste" type="number" placeholder="Nuevo monto total"></div>
+        <button class="btn-outline btn-sm" id="btn-ajustar" style="margin-bottom:12px;">Guardar</button>
+      </div>
+      <div class="msg" id="ajuste-msg"></div>
+
+      <h3 style="margin-top:10px;">Solicitudes de recarga</h3>
+      <div id="det-recargas"></div>
+
+      <h3 style="margin-top:20px;">Solicitudes de retiro</h3>
+      <div id="det-retiros"></div>
     </div>
-    <form id="apostar-form">
-      <div class="modal-field">
-        <label>Hora del sorteo</label>
-        <select id="apuesta-hora" required style="width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:14px;font-weight:600;">
-          <option value="">Selecciona hora…</option>
-          <option>08:00 a. m.</option>
-          <option>09:00 a. m.</option>
-          <option>10:00 a. m.</option>
-          <option>11:00 a. m.</option>
-          <option>12:00 p. m.</option>
-          <option>01:00 p. m.</option>
-          <option>02:00 p. m.</option>
-          <option>03:00 p. m.</option>
-          <option>04:00 p. m.</option>
-          <option>05:00 p. m.</option>
-          <option>06:00 p. m.</option>
-          <option>07:00 p. m.</option>
-        </select>
-      </div>
-      <div class="modal-field">
-        <label>Animalito (número o nombre)</label>
-        <select id="apuesta-animalito" required style="width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:14px;font-weight:600;">
-          <option value="">Selecciona animalito…</option>
-        </select>
-      </div>
-      <div class="modal-field">
-        <label>Monto a apostar</label>
-        <input type="number" id="apuesta-monto" min="1" step="1" required placeholder="Ej. 100">
-      </div>
-      <button type="submit" class="modal-submit">Confirmar apuesta</button>
-      <div class="modal-msg" id="apuesta-msg"></div>
-    </form>
-    <div id="mis-apuestas" style="margin-top:18px;"></div>
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottomnav">
-  <div class="navitem active">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12l8-8 8 8M6 10v9a1 1 0 001 1h4v-6h2v6h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Apostar
-  </div>
-  <div class="navitem">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 12v7a1 1 0 01-1 1H5a1 1 0 01-1-1v-7M2 7h20v5H2zM12 22V7M12 7c-1.5-3.5-6-4-6-1s3 3 6 1zM12 7c1.5-3.5 6-4 6-1s-3 3-6 1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-    Promociones
-  </div>
-  <div class="navitem">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" stroke="currentColor" stroke-width="1.6"/></svg>
-    Perfil
   </div>
 </div>
 
@@ -830,413 +112,202 @@
 // ==== Completa esto con los datos de tu proyecto de Supabase ====
 const SUPABASE_URL = "https://jermqpozjczpjtfjkdbz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Implcm1xcG96amN6cGp0ZmprZGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMTg1MzksImV4cCI6MjEwNTY5NDUzOX0.cvtjdXVokAqXakZgmGQ2ps2v6Vtm7fiSwFkjzdHunm4";
+// Recuerda reemplazar también TU_ADMIN_UID_AQUI en el SQL
 // ==================================================================
+
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let usuarioActual = null; // { id, nombre, telefono, creado_en }
 
-/* ============================================================
-   RELOJ / CUENTA REGRESIVA REAL
-   Horario de referencia investigado para loterías de "animalitos"
-   venezolanas de este tipo (Guácharo Activo / Lotto Activo):
-   sorteos aproximadamente cada hora, desde las 9:00 a.m. hasta
-   las 9:00 p.m. (13 sorteos diarios). No existe una tabla oficial
-   única y pública, así que este horario es una aproximación
-   basada en patrones reportados por medios venezolanos.
-   ============================================================ */
+const loginView = document.getElementById('login-view');
+const app = document.getElementById('app');
 
-const DRAW_START_HOUR = 9;   // 9:00 a.m.
-const DRAW_END_HOUR   = 21;  // 9:00 p.m. (último sorteo)
-const BASE_DRAW_NUMBER = 4570; // número de sorteo base, solo ilustrativo
+const ADMIN_PHONE = '3013254193';
 
-function pad(n){ return n.toString().padStart(2,'0'); }
-
-function getNextDrawTime(now){
-  const d = new Date(now);
-  d.setMinutes(0,0,0);
-  let hour = d.getHours();
-
-  if (hour < DRAW_START_HOUR) {
-    d.setHours(DRAW_START_HOUR);
-    return d;
-  }
-  if (hour >= DRAW_END_HOUR) {
-    // pasado el último sorteo del día -> primer sorteo de mañana
-    d.setDate(d.getDate()+1);
-    d.setHours(DRAW_START_HOUR);
-    return d;
-  }
-  // siguiente hora en punto dentro del rango de sorteos
-  d.setHours(hour+1);
-  return d;
+function soloDigitos(tel){
+  return String(tel || '').replace(/\D/g, '');
 }
 
-function formatHourLabel(date, refNow){
-  const sameDay = date.toDateString() === refNow.toDateString();
-  const h = date.getHours();
-  const ampm = h >= 12 ? 'p. m.' : 'a. m.';
-  let h12 = h % 12; if (h12 === 0) h12 = 12;
-  return (sameDay ? 'Hoy' : 'Mañana') + ' · ' + h12 + ':00 ' + ampm;
+function telefonoAEmail(tel){
+  return soloDigitos(tel) + '@telefono.guacharoactivo.app';
 }
 
-function drawNumberFor(date){
-  // genera un número de sorteo incremental estable basado en la fecha/hora
-  const epochHours = Math.floor(date.getTime() / (1000*60*60));
-  return BASE_DRAW_NUMBER + (epochHours % 900);
+function esAdminSession(session){
+  if (!session) return false;
+  const metaTel = soloDigitos(session.user.user_metadata?.telefono);
+  const emailTel = soloDigitos((session.user.email || '').split('@')[0]);
+  return metaTel === ADMIN_PHONE || emailTel === ADMIN_PHONE;
 }
 
-function tickCountdown(){
-  const now = new Date();
-  const next = getNextDrawTime(now);
-  let diff = Math.max(0, next.getTime() - now.getTime());
-
-  const totalSeconds = Math.floor(diff/1000);
-  const hh = Math.floor(totalSeconds/3600);
-  const mm = Math.floor((totalSeconds%3600)/60);
-  const ss = totalSeconds%60;
-
-  document.getElementById('cd-h').textContent = pad(hh);
-  document.getElementById('cd-m').textContent = pad(mm);
-  document.getElementById('cd-s').textContent = pad(ss);
-
-  document.getElementById('next-draw-label').textContent = formatHourLabel(next, now);
-  document.getElementById('draw-number').textContent = '#' + drawNumberFor(next);
-
-  const urgent = totalSeconds <= 60;
-  document.getElementById('box-s').classList.toggle('urgent', urgent);
-}
-
-setInterval(tickCountdown, 1000);
-tickCountdown();
-
-/* ============================================================
-   RESULTADOS: leídos del bloque de datos embebido en la página
-   ============================================================ */
-function todayLabel(){
-  const d = new Date();
-  const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  return `${pad(d.getDate())} ${meses[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-function renderResultados(resultados){
-  const grid = document.getElementById('results-grid');
-  grid.innerHTML = '';
-  resultados.slice(0, 8).forEach(r => {
-    const card = document.createElement('div');
-    card.className = 'result-card';
-    card.innerHTML = `
-      <div class="result-top">
-        <div class="ic">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6M5 15a8 8 0 0013.86 3.36M19 9A8 8 0 005.14 5.64" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </div>
-        <div>
-          <div class="rn">#${r.sorteo}</div>
-          <div class="rt">${todayLabel()} · ${r.hora}</div>
-        </div>
-      </div>
-      <div class="result-balls" style="align-items:center;">
-        <div class="rball" style="width:auto;border-radius:10px;padding:0 10px;">${pad(Number(r.numero))}</div>
-        <div style="font-size:12px;font-weight:800;color:var(--gold);align-self:center;">${r.animalito}</div>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-  if (resultados.length === 0){
-    grid.innerHTML = '<div style="color:var(--text-dim);font-weight:600;padding:12px;">Aún no se han cargado resultados.</div>';
-  }
-}
-
-async function cargarResultados(){
-  const { data, error } = await sb.from('resultados').select('*').order('sorteo', { ascending: false }).limit(8);
-  renderResultados(error ? [] : data);
-}
-cargarResultados();
-
-/* ============================================================
-   ENTRAR / REGISTRARSE / CAJERO / RECARGAS / RETIROS
-   Cuentas reales con Supabase Auth, identificadas por teléfono
-   (por dentro se usa un correo técnico derivado del teléfono).
-   ============================================================ */
-(function(){
-  const authModal   = document.getElementById('auth-modal');
-  const btnLogin    = document.getElementById('btn-open-login');
-  const btnRegister = document.getElementById('btn-open-register');
-  const modalClose  = document.getElementById('modal-close-btn');
-  const tabs        = document.querySelectorAll('.modal-tab');
-  const loginForm   = document.getElementById('login-form');
-  const registerForm= document.getElementById('register-form');
-  const loggedOutEl = document.getElementById('auth-logged-out');
-  const loggedInEl  = document.getElementById('auth-logged-in');
-  const userNameEl  = document.getElementById('user-name-value');
-  const cajeroEl    = document.getElementById('cajero-value');
-  const cajeroPill  = document.getElementById('cajero-pill');
-
-  function telefonoAEmail(tel){
-    return tel.replace(/\D/g, '') + '@telefono.guacharoactivo.app';
-  }
-
-  function openModal(tab){ authModal.classList.add('open'); switchTab(tab); }
-  function closeModal(){ authModal.classList.remove('open'); }
-  function switchTab(tab){
-    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-    loginForm.style.display = tab === 'login' ? 'block' : 'none';
-    registerForm.style.display = tab === 'register' ? 'block' : 'none';
-  }
-
-  btnLogin.addEventListener('click', () => openModal('login'));
-  btnRegister.addEventListener('click', () => openModal('register'));
-  modalClose.addEventListener('click', closeModal);
-  authModal.addEventListener('click', (e) => { if (e.target === authModal) closeModal(); });
-  tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
-
-  async function renderAuthState(){
-    const { data: { session } } = await sb.auth.getSession();
-    if (session){
-      loggedOutEl.style.display = 'none';
-      loggedInEl.style.display = 'flex';
-      cajeroPill.style.display = 'flex';
-      userNameEl.textContent = session.user.user_metadata?.nombre || session.user.user_metadata?.telefono || 'Cuenta';
-      cajeroEl.textContent = '…';
-      const { data } = await sb.from('saldos').select('saldo').eq('user_id', session.user.id).maybeSingle();
-      const bal = data ? Number(data.saldo) : 0;
-      cajeroEl.textContent = '$' + bal.toLocaleString('es-VE');
-      document.getElementById('cajero-menu-saldo').textContent = '$' + bal.toLocaleString('es-VE');
-    } else {
-      loggedOutEl.style.display = 'flex';
-      loggedInEl.style.display = 'none';
-      cajeroPill.style.display = 'none';
-      cajeroEl.textContent = '$0';
-    }
-  }
-
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const telefono = document.getElementById('login-user').value.trim();
-    const pass = document.getElementById('login-pass').value;
-    const msg = document.getElementById('login-msg');
-    msg.style.color = 'var(--text-dim)'; msg.textContent = 'Entrando…';
-    const { error } = await sb.auth.signInWithPassword({ email: telefonoAEmail(telefono), password: pass });
-    if (error){
-      msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Teléfono o contraseña incorrectos.';
-      return;
-    }
-    renderAuthState();
-    closeModal();
-    loginForm.reset();
-    msg.textContent = '';
-  });
-
-  registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const nombre = document.getElementById('reg-name').value.trim();
-    const telefono = document.getElementById('reg-user').value.trim();
-    const pass = document.getElementById('reg-pass').value;
-    const msg = document.getElementById('register-msg');
-    if (!nombre || !telefono || !pass){
-      msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Completa todos los campos.';
-      return;
-    }
-    msg.style.color = 'var(--text-dim)'; msg.textContent = 'Creando cuenta…';
-    const { error } = await sb.auth.signUp({
-      email: telefonoAEmail(telefono), password: pass,
-      options: { data: { telefono, nombre } }
-    });
-    if (error){
-      msg.style.color = 'var(--danger-ring)';
-      msg.textContent = error.message.includes('registered') ? 'Ese teléfono ya tiene una cuenta.' : 'No se pudo crear la cuenta.';
-      return;
-    }
-    renderAuthState();
-    closeModal();
-    registerForm.reset();
-    msg.textContent = '';
-  });
-
-  loggedInEl.addEventListener('click', async () => {
-    if (confirm('¿Cerrar sesión?')){
+async function checkSession(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (session && esAdminSession(session)){
+    loginView.style.display = 'none';
+    app.style.display = 'block';
+    document.getElementById('who').textContent = session.user.user_metadata?.telefono || ADMIN_PHONE;
+    cargarUsuarios();
+  } else {
+    if (session && !esAdminSession(session)){
       await sb.auth.signOut();
-      renderAuthState();
+      const msg = document.getElementById('login-msg');
+      msg.style.color = 'var(--danger)';
+      msg.textContent = 'Esta cuenta no es administrador.';
     }
-  });
+    loginView.style.display = 'block';
+    app.style.display = 'none';
+  }
+}
 
-  sb.auth.onAuthStateChange(() => renderAuthState());
-  renderAuthState();
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const phone = document.getElementById('l-phone').value.trim();
+  const password = document.getElementById('l-pass').value;
+  const msg = document.getElementById('login-msg');
+  msg.style.color = 'var(--text-dim)'; msg.textContent = 'Entrando…';
+  if (soloDigitos(phone) !== ADMIN_PHONE){
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'Solo el administrador puede entrar aquí.';
+    return;
+  }
+  const { error } = await sb.auth.signInWithPassword({ email: telefonoAEmail(phone), password });
+  if (error){ msg.style.color = 'var(--danger)'; msg.textContent = 'Teléfono o contraseña incorrectos.'; return; }
+  msg.textContent = '';
+  checkSession();
+});
 
-  /* -------- Menú del cajero -------- */
-  const cajeroModal = document.getElementById('cajero-modal');
-  cajeroPill.addEventListener('click', () => cajeroModal.classList.add('open'));
-  document.getElementById('cajero-menu-close').addEventListener('click', () => cajeroModal.classList.remove('open'));
-  cajeroModal.addEventListener('click', (e) => { if (e.target === cajeroModal) cajeroModal.classList.remove('open'); });
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  checkSession();
+});
 
-  /* -------- Recargar / Retirar -------- */
-  const recargaModal = document.getElementById('recarga-modal');
-  const retiroModal  = document.getElementById('retiro-modal');
+/* -------- Resultados + liquidación automática -------- */
+document.getElementById('btn-resultado').addEventListener('click', async () => {
+  const msg = document.getElementById('resultado-msg');
+  const hora = document.getElementById('r-hora').value.trim();
+  const animalito = document.getElementById('r-animalito').value.trim().toUpperCase();
+  const numero = document.getElementById('r-numero').value;
+  if (!hora || !animalito || numero === ''){
+    msg.style.color = 'var(--danger)'; msg.textContent = 'Completa todos los campos.'; return;
+  }
+  const { data: last } = await sb.from('resultados').select('sorteo').order('sorteo', { ascending: false }).limit(1);
+  const sorteo = last && last.length ? last[0].sorteo + 1 : 4571;
 
-  document.getElementById('btn-open-recarga').addEventListener('click', () => {
-    cajeroModal.classList.remove('open');
-    recargaModal.classList.add('open'); cargarHistorial('recargas', 'recarga-historial');
-  });
-  document.getElementById('btn-open-retiro').addEventListener('click', () => {
-    cajeroModal.classList.remove('open');
-    retiroModal.classList.add('open'); cargarHistorial('retiros', 'retiro-historial');
-  });
-  document.getElementById('recarga-close-btn').addEventListener('click', () => recargaModal.classList.remove('open'));
-  document.getElementById('retiro-close-btn').addEventListener('click', () => retiroModal.classList.remove('open'));
-  [recargaModal, retiroModal].forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); }));
-
-  function estadoColor(estado){
-    return estado === 'aprobada' ? 'var(--gold)' : estado === 'rechazada' ? 'var(--danger-ring)' : 'var(--text-dim)';
+  // 1. Guardar el resultado
+  const { error } = await sb.from('resultados').insert({ sorteo, hora, animalito, numero: Number(numero) });
+  if (error){
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'No se pudo guardar: ' + error.message;
+    return;
   }
 
-  async function cargarHistorial(tabla, contenedorId){
-    const cont = document.getElementById(contenedorId);
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session){ cont.innerHTML = ''; return; }
-    const { data, error } = await sb.from(tabla).select('*').eq('user_id', session.user.id).order('creado_en', { ascending: false }).limit(5);
-    if (error || !data || !data.length){ cont.innerHTML = '<div style="font-size:12px;color:var(--text-dim);">Sin solicitudes recientes.</div>'; return; }
-    cont.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px;">Tus últimas solicitudes</div>' +
-      data.map(r => `<div style="display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px;">
-        <span>$${Number(r.monto).toLocaleString('es-VE')}</span>
-        <span style="font-weight:700;color:${estadoColor(r.estado)};text-transform:capitalize;">${r.estado}</span>
-      </div>`).join('');
-  }
-
-  document.getElementById('recarga-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msg = document.getElementById('recarga-msg');
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
-    const monto = document.getElementById('recarga-monto').value;
-    const referencia = document.getElementById('recarga-referencia').value.trim();
-    const { error } = await sb.from('recargas').insert({ user_id: session.user.id, monto: Number(monto), referencia });
-    msg.style.color = error ? 'var(--danger-ring)' : 'var(--gold)';
-    msg.textContent = error ? 'No se pudo enviar la solicitud.' : 'Solicitud enviada. Te acreditamos al confirmar el pago.';
-    if (!error){ e.target.reset(); cargarHistorial('recargas', 'recarga-historial'); }
+  // 2. Liquidar apuestas de esa hora (actualiza saldos de ganadores)
+  const { data: liquidadas, error: errLiq } = await sb.rpc('liquidar_sorteo', {
+    p_hora: hora,
+    p_numero: Number(numero),
+    p_animalito: animalito
   });
 
-  document.getElementById('retiro-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msg = document.getElementById('retiro-msg');
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
-    const monto = document.getElementById('retiro-monto').value;
-    const datos_pago = document.getElementById('retiro-datos').value.trim();
-    const { error } = await sb.from('retiros').insert({ user_id: session.user.id, monto: Number(monto), datos_pago });
-    msg.style.color = error ? 'var(--danger-ring)' : 'var(--gold)';
-    msg.textContent = error ? 'No se pudo enviar la solicitud.' : 'Solicitud enviada. La procesamos pronto.';
-    if (!error){ e.target.reset(); cargarHistorial('retiros', 'retiro-historial'); }
-  });
-
-  /* -------- APOSTAR -------- */
-  const ANIMALITOS = [
-    {n:0, nombre:'DELFÍN'},{n:00, nombre:'BALLENA'},{n:1, nombre:'CARNERO'},{n:2, nombre:'TORO'},
-    {n:3, nombre:'CIEMPÍES'},{n:4, nombre:'ALACRÁN'},{n:5, nombre:'LEÓN'},{n:6, nombre:'RANA'},
-    {n:7, nombre:'PERICO'},{n:8, nombre:'RATÓN'},{n:9, nombre:'ÁGUILA'},{n:10, nombre:'TIGRE'},
-    {n:11, nombre:'GATO'},{n:12, nombre:'CABALLO'},{n:13, nombre:'MONO'},{n:14, nombre:'PALOMA'},
-    {n:15, nombre:'ZORRO'},{n:16, nombre:'OSO'},{n:17, nombre:'PAVO'},{n:18, nombre:'BURRO'},
-    {n:19, nombre:'CHIVO'},{n:20, nombre:'COCHINO'},{n:21, nombre:'GALLO'},{n:22, nombre:'CAMELLO'},
-    {n:23, nombre:'CEBRA'},{n:24, nombre:'IGUANA'},{n:25, nombre:'GALLINA'},{n:26, nombre:'VACA'},
-    {n:27, nombre:'PERRO'},{n:28, nombre:'ZAMURO'},{n:29, nombre:'ELEFANTE'},{n:30, nombre:'CAIMÁN'},
-    {n:31, nombre:'LAPA'},{n:32, nombre:'ARDILLA'},{n:33, nombre:'PESCADO'},{n:34, nombre:'VENADO'},
-    {n:35, nombre:'JIRAFA'},{n:36, nombre:'CULEBRA'},{n:37, nombre:'TORTUGA'},{n:38, nombre:'BÚFALO'},
-    {n:39, nombre:'LECHUZA'},{n:40, nombre:'AVISPA'},{n:41, nombre:'CANGURO'},{n:42, nombre:'TUCÁN'},
-    {n:43, nombre:'MARIPOSA'},{n:44, nombre:'CHIGÜIRE'},{n:45, nombre:'GARZA'},{n:46, nombre:'PUMA'},
-    {n:47, nombre:'PAVORREAL'},{n:48, nombre:'PUERCOESPÍN'},{n:49, nombre:'PEREZA'},{n:50, nombre:'CANARIO'},
-    {n:51, nombre:'PELICANO'},{n:52, nombre:'PULPO'},{n:53, nombre:'CARACOL'},{n:54, nombre:'GRILLO'},
-    {n:55, nombre:'OSO HORMIGUERO'},{n:56, nombre:'TIBURÓN'},{n:57, nombre:'PATO'},{n:58, nombre:'HORMIGA'},
-    {n:59, nombre:'PANTERA'},{n:60, nombre:'CAMALEÓN'},{n:61, nombre:'PANDA'},{n:62, nombre:'CACHICAMO'},
-    {n:63, nombre:'CANGREJO'},{n:64, nombre:'GAVILÁN'},{n:65, nombre:'ARAÑA'},{n:66, nombre:'LOBO'},
-    {n:67, nombre:'AVESTRUZ'},{n:68, nombre:'JAGUAR'},{n:69, nombre:'CONEJO'},{n:70, nombre:'BISONTE'},
-    {n:71, nombre:'GUACAMAYA'},{n:72, nombre:'GORILA'},{n:73, nombre:'HIPOPÓTAMO'},{n:74, nombre:'TURPIAL'},
-    {n:75, nombre:'GUÁCHARO'}
-  ];
-
-  // Llenar el select de animalitos
-  const selAnimal = document.getElementById('apuesta-animalito');
-  ANIMALITOS.forEach(a => {
-    const opt = document.createElement('option');
-    opt.value = a.n;
-    opt.textContent = String(a.n).padStart(2,'0') + ' — ' + a.nombre;
-    selAnimal.appendChild(opt);
-  });
-
-  const apostarModal = document.getElementById('apostar-modal');
-  document.getElementById('btn-jugar').addEventListener('click', async () => {
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session){
-      openModal('login');
-      return;
-    }
-    apostarModal.classList.add('open');
-    cargarMisApuestas();
-  });
-  document.getElementById('apostar-close-btn').addEventListener('click', () => apostarModal.classList.remove('open'));
-  apostarModal.addEventListener('click', (e) => { if (e.target === apostarModal) apostarModal.classList.remove('open'); });
-
-  async function cargarMisApuestas(){
-    const cont = document.getElementById('mis-apuestas');
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session){ cont.innerHTML = ''; return; }
-    const { data, error } = await sb.from('apuestas')
-      .select('*')
-      .eq('user_id', session.user.id)
-      .order('creado_en', { ascending: false })
-      .limit(8);
-    if (error || !data || !data.length){
-      cont.innerHTML = '<div style="font-size:12px;color:var(--text-dim);">Aún no tienes apuestas.</div>';
-      return;
-    }
-    cont.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px;">Tus últimas apuestas</div>' +
-      data.map(a => {
-        const color = a.estado === 'ganada' ? 'var(--gold)' : a.estado === 'perdida' ? 'var(--danger-ring)' : 'var(--text-dim)';
-        return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px;">
-          <span>${String(a.animalito_numero).padStart(2,'0')} ${a.animalito_nombre} · $${Number(a.monto).toLocaleString('es-VE')} · ${a.hora}</span>
-          <span style="font-weight:700;color:${color};text-transform:capitalize;">${a.estado}${a.premio > 0 ? ' +$'+Number(a.premio).toLocaleString('es-VE') : ''}</span>
-        </div>`;
-      }).join('');
-  }
-
-  document.getElementById('apostar-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msg = document.getElementById('apuesta-msg');
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
-
-    const hora = document.getElementById('apuesta-hora').value;
-    const numero = Number(document.getElementById('apuesta-animalito').value);
-    const monto = Number(document.getElementById('apuesta-monto').value);
-    const animal = ANIMALITOS.find(a => a.n === numero);
-
-    if (!hora || !animal || !monto || monto <= 0){
-      msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Completa todos los campos.';
-      return;
-    }
-
-    msg.style.color = 'var(--text-dim)';
-    msg.textContent = 'Procesando…';
-
-    const { data, error } = await sb.rpc('crear_apuesta', {
-      p_animalito_numero: numero,
-      p_animalito_nombre: animal.nombre,
-      p_monto: monto,
-      p_hora: hora
-    });
-
-    if (error){
-      msg.style.color = 'var(--danger-ring)';
-      msg.textContent = error.message.includes('Saldo insuficiente') ? 'Saldo insuficiente.' : ('Error: ' + error.message);
-      return;
-    }
-
+  if (errLiq){
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'Resultado guardado, pero falló la liquidación: ' + errLiq.message;
+  } else {
     msg.style.color = 'var(--gold)';
-    msg.textContent = 'Apuesta registrada. ¡Buena suerte!';
-    e.target.reset();
-    renderAuthState();       // actualiza el saldo mostrado
-    cargarMisApuestas();
-  });
-})();
-</script>
+    msg.textContent = `Resultado publicado. Se liquidaron ${liquidadas ?? 0} apuestas.`;
+  }
 
+  document.getElementById('r-hora').value = '';
+  document.getElementById('r-animalito').value = '';
+  document.getElementById('r-numero').value = '';
+});
+
+/* -------- Lista de usuarios -------- */
+async function cargarUsuarios(){
+  const list = document.getElementById('usuarios-list');
+  const filtro = document.getElementById('buscar-tel').value.trim();
+  let q = sb.from('profiles').select('*').order('creado_en', { ascending: false }).limit(30);
+  if (filtro) q = q.ilike('telefono', '%' + filtro + '%');
+  const { data, error } = await q;
+  list.innerHTML = '';
+  if (error){ list.innerHTML = '<div class="msg" style="color:var(--danger)">' + error.message + '</div>'; return; }
+  if (!data.length){ list.innerHTML = '<div class="sub">Sin resultados.</div>'; return; }
+  data.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `<span style="font-weight:700;">${p.nombre || 'Sin nombre'}</span><span style="color:var(--text-dim);">${p.telefono}</span>`;
+    row.addEventListener('click', () => abrirDetalle(p));
+    list.appendChild(row);
+  });
+}
+document.getElementById('buscar-tel').addEventListener('input', () => cargarUsuarios());
+
+document.getElementById('btn-volver').addEventListener('click', () => {
+  document.getElementById('vista-detalle').style.display = 'none';
+  document.getElementById('vista-lista').style.display = 'block';
+});
+
+/* -------- Detalle de usuario -------- */
+async function abrirDetalle(perfil){
+  usuarioActual = perfil;
+  document.getElementById('vista-lista').style.display = 'none';
+  document.getElementById('vista-detalle').style.display = 'block';
+  document.getElementById('det-nombre').textContent = perfil.nombre || 'Sin nombre';
+  document.getElementById('det-telefono').textContent = perfil.telefono;
+  document.getElementById('det-fecha').textContent = new Date(perfil.creado_en).toLocaleDateString('es-VE');
+  document.getElementById('ajuste-msg').textContent = '';
+  await refrescarDetalle();
+}
+
+async function refrescarDetalle(){
+  const { data: saldoRow } = await sb.from('saldos').select('saldo').eq('user_id', usuarioActual.id).maybeSingle();
+  document.getElementById('det-saldo').textContent = '$' + Number(saldoRow ? saldoRow.saldo : 0).toLocaleString('es-VE');
+
+  const { data: recargas } = await sb.from('recargas').select('*').eq('user_id', usuarioActual.id).order('creado_en', { ascending: false });
+  renderSolicitudes('det-recargas', recargas || [], 'recarga');
+
+  const { data: retiros } = await sb.from('retiros').select('*').eq('user_id', usuarioActual.id).order('creado_en', { ascending: false });
+  renderSolicitudes('det-retiros', retiros || [], 'retiro');
+}
+
+function renderSolicitudes(contId, items, tipo){
+  const cont = document.getElementById(contId);
+  if (!items.length){ cont.innerHTML = '<div class="sub">Sin solicitudes.</div>'; return; }
+  cont.innerHTML = '';
+  items.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.cursor = 'default';
+    const detalle = tipo === 'recarga' ? ('Ref: ' + (it.referencia || '—')) : (it.datos_pago || '—');
+    let acciones = `<span class="tag tag-${it.estado}">${it.estado}</span>`;
+    if (it.estado === 'pendiente'){
+      acciones = `<button class="btn-sm btn-ok" data-acc="aprobar" data-id="${it.id}" data-tipo="${tipo}">Aprobar</button>
+                  <button class="btn-sm btn-no" data-acc="rechazar" data-id="${it.id}" data-tipo="${tipo}">Rechazar</button>`;
+    }
+    row.innerHTML = `<div>
+        <div style="font-weight:800;">$${Number(it.monto).toLocaleString('es-VE')}</div>
+        <div style="font-size:11.5px;color:var(--text-dim);">${detalle}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">${acciones}</div>`;
+    cont.appendChild(row);
+  });
+  cont.querySelectorAll('button[data-acc]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const fn = (btn.dataset.acc === 'aprobar' ? 'aprobar_' : 'rechazar_') + btn.dataset.tipo;
+      const { error } = await sb.rpc(fn, { p_id: Number(btn.dataset.id) });
+      if (error) alert('No se pudo procesar: ' + error.message);
+      refrescarDetalle();
+    });
+  });
+}
+
+document.getElementById('btn-ajustar').addEventListener('click', async () => {
+  const msg = document.getElementById('ajuste-msg');
+  const monto = document.getElementById('det-ajuste').value;
+  if (monto === ''){ msg.style.color = 'var(--danger)'; msg.textContent = 'Escribe un monto.'; return; }
+  const { error } = await sb.from('saldos').upsert({ user_id: usuarioActual.id, saldo: Number(monto) });
+  msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
+  msg.textContent = error ? 'No se pudo guardar: ' + error.message : 'Saldo actualizado.';
+  if (!error){ document.getElementById('det-ajuste').value = ''; refrescarDetalle(); }
+});
+
+checkSession();
+</script>
 </body>
 </html>

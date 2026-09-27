@@ -498,7 +498,7 @@
       </div>
 
       <!-- USUARIO (cuando ya inició sesión) -->
-      <div class="pill clickable" id="auth-logged-in" style="display:none;" title="Clic para cerrar sesión">
+      <div class="pill clickable" id="auth-logged-in" style="display:none;" title="Ver perfil">
         <div class="ic">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" fill="currentColor"/></svg>
         </div>
@@ -815,6 +815,42 @@
       <div class="modal-msg" id="promo-msg"></div>
     </form>
     <div id="promo-historial" style="margin-top:18px;"></div>
+  </div>
+</div>
+
+<!-- VISTA PERFIL -->
+<div class="wrap" id="vista-perfil" style="display:none;">
+  <div class="hero" style="min-height:auto;padding:28px 24px;margin-bottom:18px;">
+    <div class="hero-content">
+      <h1 class="display" style="font-size:26px;" id="perfil-nombre">Tu perfil</h1>
+      <p style="margin:0 0 8px;" id="perfil-tel">—</p>
+      <div style="font-size:13px;font-weight:700;color:var(--text-dim);">SALDO</div>
+      <div style="font-size:34px;font-weight:800;color:var(--gold);margin-top:2px;" id="perfil-saldo">$0</div>
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+        <button class="cta" type="button" id="perfil-cajero" style="width:auto;padding:10px 16px;font-size:13px;">Cajero</button>
+        <button class="btn-outline" type="button" id="perfil-logout">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title" style="margin-bottom:14px;">
+      <div class="ic">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <span>NÚMEROS JUGADOS</span>
+    </div>
+    <div id="perfil-apuestas"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="margin-bottom:14px;">
+      <div class="ic">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 7h18v12H3zM3 7l2-3h14l2 3" stroke="currentColor" stroke-width="1.8"/></svg>
+      </div>
+      <span>TUS SOLICITUDES</span>
+    </div>
+    <div id="perfil-solicitudes"></div>
   </div>
 </div>
 
@@ -1154,12 +1190,7 @@ cargarResultados();
     msg.textContent = '';
   });
 
-  loggedInEl.addEventListener('click', async () => {
-    if (confirm('¿Cerrar sesión?')){
-      await sb.auth.signOut();
-      renderAuthState();
-    }
-  });
+  loggedInEl.addEventListener('click', () => mostrarVista('perfil'));
 
   sb.auth.onAuthStateChange(() => renderAuthState());
   renderAuthState();
@@ -1223,10 +1254,16 @@ cargarResultados();
     if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
     const monto = document.getElementById('retiro-monto').value;
     const datos_pago = document.getElementById('retiro-datos').value.trim();
-    const { error } = await sb.from('retiros').insert({ user_id: session.user.id, monto: Number(monto), datos_pago });
+    const { error } = await sb.rpc('crear_retiro', { p_monto: Number(monto), p_datos_pago: datos_pago });
     msg.style.color = error ? 'var(--danger-ring)' : 'var(--gold)';
-    msg.textContent = error ? 'No se pudo enviar la solicitud.' : 'Solicitud enviada. La procesamos pronto.';
-    if (!error){ e.target.reset(); cargarHistorial('retiros', 'retiro-historial'); }
+    msg.textContent = error
+      ? (error.message.includes('Saldo insuficiente') ? 'Saldo insuficiente.' : 'No se pudo enviar la solicitud.')
+      : 'Solicitud enviada. El monto ya se descontó de tu saldo.';
+    if (!error){
+      e.target.reset();
+      cargarHistorial('retiros', 'retiro-historial');
+      renderAuthState();
+    }
   });
 
   /* -------- APOSTAR -------- */
@@ -1298,20 +1335,84 @@ cargarResultados();
   function mostrarVista(nombre){
     document.getElementById('vista-home').style.display = nombre === 'home' ? 'block' : 'none';
     document.getElementById('vista-promos').style.display = nombre === 'promos' ? 'block' : 'none';
+    document.getElementById('vista-perfil').style.display = nombre === 'perfil' ? 'block' : 'none';
     document.querySelectorAll('.bottomnav .navitem').forEach(el => el.classList.remove('active'));
     if (nombre === 'promos') document.getElementById('nav-promos').classList.add('active');
+    else if (nombre === 'perfil') document.getElementById('nav-perfil').classList.add('active');
     else document.getElementById('nav-apostar').classList.add('active');
     if (nombre === 'promos') cargarCanjes();
+    if (nombre === 'perfil') cargarPerfil();
   }
 
   document.getElementById('nav-promos').addEventListener('click', () => mostrarVista('promos'));
-  document.getElementById('nav-perfil').addEventListener('click', () => {
-    mostrarVista('home');
-    document.getElementById('auth-logged-in').style.display !== 'none'
-      ? document.getElementById('cajero-pill').click()
-      : document.getElementById('btn-open-login').click();
+  document.getElementById('nav-perfil').addEventListener('click', async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ openModal('login'); return; }
+    mostrarVista('perfil');
   });
   document.getElementById('btn-ir-promos').addEventListener('click', () => mostrarVista('promos'));
+
+  async function cargarPerfil(){
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ mostrarVista('home'); openModal('login'); return; }
+    const nombre = session.user.user_metadata?.nombre || 'Usuario';
+    const tel = session.user.user_metadata?.telefono || (session.user.email || '').split('@')[0];
+    document.getElementById('perfil-nombre').textContent = nombre;
+    document.getElementById('perfil-tel').textContent = tel;
+    const { data: saldoRow } = await sb.from('saldos').select('saldo').eq('user_id', session.user.id).maybeSingle();
+    document.getElementById('perfil-saldo').textContent = '$' + Number(saldoRow ? saldoRow.saldo : 0).toLocaleString('es-CO');
+
+    const apCont = document.getElementById('perfil-apuestas');
+    const { data: apuestas } = await sb.from('apuestas').select('*').eq('user_id', session.user.id).order('creado_en', { ascending: false }).limit(30);
+    if (!apuestas || !apuestas.length){
+      apCont.innerHTML = '<div style="font-size:13px;color:var(--text-dim);">Aún no has jugado ningún número.</div>';
+    } else {
+      apCont.innerHTML = apuestas.map(a => {
+        const color = a.estado === 'ganada' ? 'var(--gold)' : a.estado === 'perdida' ? 'var(--danger-ring)' : 'var(--text-dim)';
+        const num = String(a.animalito_numero).padStart(2,'0');
+        return `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,#2a1a5a,#1a1038);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold);">${num}</div>
+            <div>
+              <div style="font-weight:800;">${a.animalito_nombre}</div>
+              <div style="font-size:12px;color:var(--text-dim);">${a.hora} · $${Number(a.monto).toLocaleString('es-CO')}</div>
+            </div>
+          </div>
+          <div style="text-align:right;font-weight:800;color:${color};text-transform:capitalize;">${a.estado}${a.premio > 0 ? '<div style="font-size:12px;">+$'+Number(a.premio).toLocaleString('es-CO')+'</div>' : ''}</div>
+        </div>`;
+      }).join('');
+    }
+
+    const solCont = document.getElementById('perfil-solicitudes');
+    const { data: recargas } = await sb.from('recargas').select('*').eq('user_id', session.user.id).order('creado_en', { ascending: false }).limit(15);
+    const { data: retiros } = await sb.from('retiros').select('*').eq('user_id', session.user.id).order('creado_en', { ascending: false }).limit(15);
+    const items = [
+      ...(recargas || []).map(r => ({...r, tipo:'Recarga'})),
+      ...(retiros || []).map(r => ({...r, tipo:'Retiro'}))
+    ].sort((a,b) => new Date(b.creado_en) - new Date(a.creado_en));
+    if (!items.length){
+      solCont.innerHTML = '<div style="font-size:13px;color:var(--text-dim);">No tienes solicitudes todavía.</div>';
+    } else {
+      const colorEst = { pendiente:'var(--text-dim)', aprobada:'var(--gold)', rechazada:'var(--danger-ring)' };
+      solCont.innerHTML = items.map(s => `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--line);">
+        <div>
+          <div style="font-weight:800;">${s.tipo} · $${Number(s.monto).toLocaleString('es-CO')}</div>
+          <div style="font-size:12px;color:var(--text-dim);">${new Date(s.creado_en).toLocaleString('es-CO')}</div>
+        </div>
+        <span style="font-weight:800;text-transform:capitalize;color:${colorEst[s.estado] || 'var(--text-dim)'};">${s.estado}</span>
+      </div>`).join('');
+    }
+  }
+
+  document.getElementById('perfil-cajero').addEventListener('click', () => {
+    document.getElementById('cajero-modal').classList.add('open');
+  });
+  document.getElementById('perfil-logout').addEventListener('click', async () => {
+    if (!confirm('¿Cerrar sesión?')) return;
+    await sb.auth.signOut();
+    renderAuthState();
+    mostrarVista('home');
+  });
 
   async function cargarCanjes(){
     const cont = document.getElementById('promo-historial');

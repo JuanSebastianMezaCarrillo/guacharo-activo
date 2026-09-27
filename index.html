@@ -2,11 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Guácharo Activo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg: #0b0620;
@@ -414,55 +415,51 @@
   .modal-msg{font-size:12px;font-weight:700;margin-top:10px;text-align:center;min-height:16px;}
 
   @media (max-width:600px){
-    .hero{padding:32px 22px;min-height:260px;}
-    .hero-content h1{font-size:32px;}
+    .wrap{padding:14px 12px 96px;}
+
+    header{gap:10px;padding-bottom:16px;}
+    .brand-mark{width:44px;height:44px;border-radius:12px;}
+    .brand-mark svg{width:24px;height:24px;}
+    .brand-text .n1{font-size:19px;}
+    .brand-text .n2{font-size:11px;}
+
+    .header-actions{width:100%;gap:8px;}
+    .pill{padding:7px 10px;border-radius:12px;flex:1 1 auto;min-width:0;}
+    .pill .ic{width:28px;height:28px;border-radius:8px;}
+    .pill .label{font-size:9.5px;}
+    .pill .value{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .auth-btns{width:100%;gap:8px;}
+    .btn-auth{flex:1;padding:11px 10px;font-size:12.5px;text-align:center;}
+
+    .hero{padding:26px 18px;min-height:220px;border-radius:20px;}
+    .hero-content h1{font-size:28px;}
+    .hero-content p{font-size:13.5px;margin:10px 0 20px;}
+    .cta{padding:13px 22px;font-size:14px;width:100%;justify-content:center;}
     .hero-orb{display:none;}
-    .wrap{padding:16px 14px 100px;}
+
+    .card{padding:18px 16px 20px;border-radius:14px;}
+    .card-title{font-size:13.5px;}
+    .cbox{padding:12px 4px 8px;}
+    .cbox .num{font-size:24px;}
+    .hot-grid{grid-template-columns:repeat(5,1fr);gap:7px;}
+    .hot-ball{font-size:14px;}
+    .meta-row{font-size:12px;}
+
+    .section-title{font-size:14.5px;}
+    .promo{flex-direction:column;align-items:stretch;text-align:left;padding:16px;}
+    .btn-outline{justify-content:center;width:100%;}
+
+    .bottomnav{padding:10px 6px calc(12px + env(safe-area-inset-bottom, 0px));}
+    .navitem{padding:4px 8px;font-size:10.5px;}
+
+    .modal-box{padding:20px 18px;border-radius:16px;}
   }
 
-  /* Estilo visual inspirado en la pantalla móvil de Guácharo Activo.
-     Las reglas se mantienen al final para no afectar la lógica existente. */
-  :root{
-    --bg:#030712;--bg-2:#090d22;--card:#090d25;--card-2:#11143b;
-    --purple-1:#5e19cf;--purple-2:#8d4bff;--purple-glow:#9d69ff;
-    --gold:#ffc51e;--gold-2:#ffe06a;--text:#f6f5ff;--text-dim:#aeb5ed;
-    --line:rgba(105,111,237,.22);--radius:20px;--radius-sm:16px;
+  @media (max-width:380px){
+    .hero-content h1{font-size:24px;}
+    .header-actions{flex-wrap:wrap;}
+    .pill{flex:1 1 44%;}
   }
-  body{background:radial-gradient(900px 550px at 100% -10%,rgba(57,34,160,.18),transparent 58%),linear-gradient(135deg,#030713 0%,#050918 48%,#02040c 100%);}
-  .wrap{max-width:1120px;padding:28px 38px 110px;}
-  header{padding-bottom:26px;border-bottom:1px solid rgba(102,107,226,.18);}
-  .brand{gap:10px}.brand-mark{width:62px;height:58px;background:transparent;box-shadow:none;border-radius:0;position:relative;overflow:visible}
-  .brand-mark::after{content:'🦅';font-size:51px;filter:drop-shadow(0 4px 3px rgba(0,0,0,.5));transform:rotate(-9deg)}
-  .brand-mark svg{display:none}.brand-text{display:flex;align-items:baseline;gap:2px}.brand-text .n1{font-size:34px;font-style:italic;letter-spacing:-.07em}.brand-text .n2{font-size:29px;font-style:italic;letter-spacing:-.07em;color:var(--gold)}
-  .header-actions{gap:12px}.pill{background:linear-gradient(135deg,#0d1031,#090b22);border-color:rgba(125,70,255,.44);border-radius:20px;padding:10px 17px}.pill .ic{background:transparent;color:#9259ff}.pill .label{font-size:12px}.pill .value{font-size:18px}.btn-auth{border-color:rgba(125,70,255,.45);border-radius:16px}.btn-auth.primary,.btn-outline{background:linear-gradient(135deg,#7735e8,#4b12b0)}
-  .hero{min-height:365px;padding:52px 48px;background:radial-gradient(500px 360px at 86% 40%,rgba(103,40,233,.58),transparent 63%),linear-gradient(108deg,#090b2d 0%,#10082f 57%,#1a0842 100%);border-color:rgba(87,99,221,.25);box-shadow:0 18px 55px rgba(0,0,0,.32)}
-  .hero::before{content:'';position:absolute;right:-80px;top:-145px;width:480px;height:650px;opacity:.7;background:radial-gradient(ellipse at 48% 50%,transparent 0 32%,#060816 33% 46%,transparent 47%),linear-gradient(125deg,transparent 44%,rgba(255,198,30,.95) 45% 47%,transparent 48%);transform:rotate(-12deg)}
-  .hero-content{max-width:490px}.hero-content h1{font-size:54px;line-height:.98;text-shadow:0 4px 0 rgba(2,3,12,.25)}.hero-content p{font-size:17px;color:#f1efff;max-width:380px}.cta{font-size:16px;padding:15px 29px;box-shadow:0 9px 24px rgba(255,190,20,.25)}
-  .hero-orb{right:0;width:480px;height:390px;opacity:1}.hero-orb::before{content:'GUÁCHARO';position:absolute;right:10px;top:92px;color:#060816;font:900 italic 63px/1 'Archivo Black',sans-serif;letter-spacing:-.08em;text-shadow:-2px 0 #8939ff,0 2px #8939ff;transform:rotate(-10deg);opacity:.92}.ball{z-index:2;border:3px solid #7228dd;box-shadow:inset 0 -10px 16px rgba(49,13,125,.5),0 13px 26px rgba(0,0,0,.45)}.ball.b1{left:15%;top:2%}.ball.b2{left:48%;top:58%}.ball.b3{right:3%;top:31%}
-  .grid2{grid-template-columns:1fr 1fr;gap:18px}.card,.result-card,.game-card{background:linear-gradient(135deg,rgba(12,15,45,.98),rgba(6,9,26,.98));border-color:rgba(82,94,214,.24);box-shadow:0 10px 28px rgba(0,0,0,.16)}.card{padding:24px}.card-title{font-size:17px}.card-title .ic,.section-title .ic{background:rgba(108,45,235,.25);color:#9962ff}.cbox{background:linear-gradient(145deg,#19114c,#100e31);border-color:rgba(110,80,234,.25)}.cbox .num{color:#ddd4ff}.meta-row{border-color:rgba(106,111,223,.2)}
-  .results-head{margin:36px 0 16px}.section-title{font-size:22px}.link-more{color:#a16cff;font-size:15px}.results-grid{grid-template-columns:repeat(2,1fr);gap:14px}.result-card{border-radius:17px}.rball,.hot-ball{border:2px solid #7434e3;background:radial-gradient(circle at 35% 28%,#fff 0%,#ded4ff 28%,#7541df 100%);color:#070717}.games-grid{gap:14px}.game-card{border-radius:17px}.game-ic.star{background:linear-gradient(145deg,#f0b900,#7c5600)}.game-ic.heart,.game-ic.chart{background:linear-gradient(145deg,#7f29eb,#3d0c9d)}.bottomnav{background:rgba(5,7,20,.95);border-color:rgba(108,112,232,.25);padding:12px 10px 17px}.navitem{font-size:12px}.navitem.active{color:#9c61ff}.navitem.active::after{height:4px;width:90px;bottom:-12px;background:#9552ff}
-  .hero::after{background-image:linear-gradient(90deg,rgba(5,7,27,.98) 0%,rgba(6,7,29,.74) 45%,rgba(15,4,42,.28) 100%),url('assets/guacharo-referencia.png');background-size:cover;background-position:center 31%;opacity:.68;mix-blend-mode:screen}.hero-content{z-index:3}.hero-orb{z-index:2}.hero::before{z-index:1}
-  @media (max-width:700px){
-    .wrap{padding:16px 14px 108px;overflow:hidden}.brand-mark{width:44px;height:43px}.brand-mark::after{content:'';display:block;width:42px;height:42px;background:url('assets/guacharo-referencia.png') 89% 24%/250px auto no-repeat;filter:drop-shadow(0 3px 3px rgba(0,0,0,.55));transform:rotate(-6deg)}.brand-text .n1{font-size:24px}.brand-text .n2{font-size:21px}
-    header{gap:12px;padding-bottom:18px}.header-actions{width:auto;margin-left:auto;gap:7px}.header-actions #mode-flag{display:none!important}.auth-btns{display:flex;gap:6px}.btn-auth{padding:9px 10px;font-size:12px}.pill{padding:7px 9px;border-radius:15px}.pill .ic{width:25px;height:25px}.pill .label{font-size:10px}.pill .value{font-size:13px}
-    .hero{min-height:410px;padding:30px 22px;align-items:flex-start;border-radius:19px}.hero::after{background-size:auto 480px;background-position:72% 31%;opacity:.72}.hero-content{max-width:220px}.hero-content h1{font-size:36px}.hero-content p{font-size:13px;line-height:1.45;margin:13px 0 21px}.hero-orb{display:block;right:-196px;top:54%;width:405px;height:290px}.hero-orb::before{font-size:44px;right:14px;top:74px}.ball.b1{width:56px;height:56px;font-size:20px;left:18%;top:1%}.ball.b2{width:76px;height:76px;font-size:26px;left:53%;top:61%}.ball.b3{width:55px;height:55px;font-size:18px;right:0;top:34%}.cta{font-size:14px;padding:13px 22px}
-    .grid2{grid-template-columns:1fr;gap:14px}.card{padding:18px}.card-title{font-size:15px}.countdown{display:flex;gap:7px}.cbox{flex:1;padding:10px 4px 8px}.cbox .num{font-size:24px}.cbox .lab{font-size:10px}.meta-row{font-size:12px}
-    .results-head{margin:29px 0 13px}.results-grid{grid-template-columns:1fr;gap:10px}.result-card{padding:14px}.section-title{font-size:18px}.link-more{font-size:13px}.games-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.game-card{padding:12px 10px;min-width:0}.game-top{margin-bottom:14px}.game-ic{width:35px;height:35px;border-radius:10px}.game-card h3{font-size:13px;overflow-wrap:anywhere}.game-card p{font-size:10px;line-height:1.35}.game-arrow{display:none}.promo{display:flex;padding:15px}.promo .btn-outline{width:100%;justify-content:center}
-  }
-  @media (max-width:390px){.brand-text .n1{font-size:21px}.brand-text .n2{font-size:18px}.brand-mark{width:37px}.brand-mark::after{width:35px;height:35px;background-size:210px auto}.btn-auth{padding:8px;font-size:11px}.hero{min-height:395px}.hero-content h1{font-size:33px}.hero-orb{right:-214px}.section-title{font-size:17px}}
-
-  /* Arte real tomado de la referencia: sustituye el emoji y hace visible
-     la ilustración del guácharo sin modificar los controles de la página. */
-  .brand-mark{width:190px;height:72px;background:transparent;overflow:hidden}
-  .brand-mark::after{content:'';display:block;width:190px;height:72px;background:url('assets/guacharo-referencia.png') -18px -12px/510px auto no-repeat;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55));transform:none}
-  .brand-text{display:none}
-  .hero::after{z-index:1;background-image:linear-gradient(90deg,rgba(4,7,26,.98) 0%,rgba(5,7,28,.78) 42%,rgba(13,4,40,.12) 100%),url('assets/guacharo-referencia.png');background-size:1100px auto;background-position:86% -155px;background-repeat:no-repeat;opacity:.92;mix-blend-mode:normal}
-  .hero-orb{display:none}
-  @media (max-width:700px){
-    .brand-mark{width:158px;height:58px}.brand-mark::after{width:158px;height:58px;background-size:425px auto;background-position:-15px -10px}.header-actions{gap:5px}.auth-btns #btn-open-register{display:none}.btn-auth{padding:9px 9px}
-    .hero::after{background-size:740px auto;background-position:84% -108px;opacity:.96}.hero-content{max-width:210px}.hero-content h1{font-size:35px}.hero-content p{max-width:192px}.hero::before{opacity:.35}
-  }
-  @media (max-width:390px){.brand-mark{width:142px}.brand-mark::after{width:142px;background-size:382px auto}.hero-content{max-width:197px}.hero-content h1{font-size:32px}}
 </style>
 </head>
 <body>
@@ -483,21 +480,15 @@
     </div>
 
     <div class="header-actions">
-      <div class="pill clickable" id="admin-toggle" style="display:none;">
-        <div class="ic">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V19.6a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1-1.55 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.7 1.7 0 00.34-1.87 1.7 1.7 0 00-1.55-1H4.4a2 2 0 110-4h.09a1.7 1.7 0 001.55-1 1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06a1.7 1.7 0 001.87.34H10.5a1.7 1.7 0 001-1.55V4.4a2 2 0 114 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87V10.5a1.7 1.7 0 001.55 1h.09a2 2 0 110 4h-.09a1.7 1.7 0 00-1.55 1z" stroke="currentColor" stroke-width="1.4"/></svg>
-        </div>
-        <div class="value">Administrar</div>
-      </div>
       <div class="pill" id="mode-flag">
         <div class="ic">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" fill="currentColor"/></svg>
         </div>
-        <div class="value" id="mode-flag-text">Cargando…</div>
+        <div class="value">Vista pública</div>
       </div>
 
       <!-- CAJERO -->
-      <div class="pill" id="cajero-pill" title="Tu saldo">
+      <div class="pill clickable" id="cajero-pill" title="Tu saldo" style="display:none;">
         <div class="ic">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 012-2h13a2 2 0 012 2v1H3V7zm0 3h18v7a2 2 0 01-2 2H5a2 2 0 01-2-2v-7zm13 3.5a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0z" fill="currentColor"/></svg>
         </div>
@@ -525,34 +516,6 @@
       </div>
     </div>
   </header>
-
-  <!-- PANEL ADMINISTRADOR -->
-  <div class="card" id="admin-panel" style="display:none; margin-bottom:20px; border-color:var(--gold);">
-    <div class="card-head">
-      <div class="card-title">
-        <div class="ic" style="background:rgba(255,194,51,0.15);color:var(--gold);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8"/></svg>
-        </div>
-        <span>CARGAR RESULTADO DEL SORTEO FÍSICO</span>
-      </div>
-    </div>
-    <form id="admin-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:end;">
-      <div>
-        <label style="display:block;font-size:12px;color:var(--text-dim);font-weight:700;margin-bottom:6px;">Hora del sorteo</label>
-        <select id="f-hora" required style="width:100%;padding:10px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-weight:700;"></select>
-      </div>
-      <div>
-        <label style="display:block;font-size:12px;color:var(--text-dim);font-weight:700;margin-bottom:6px;">Animalito ganador</label>
-        <input id="f-animalito" required placeholder="Ej. TIGRE" style="width:100%;padding:10px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-weight:700;text-transform:uppercase;">
-      </div>
-      <div>
-        <label style="display:block;font-size:12px;color:var(--text-dim);font-weight:700;margin-bottom:6px;">Número (00-99)</label>
-        <input id="f-numero" required type="number" min="0" max="99" placeholder="Ej. 05" style="width:100%;padding:10px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-weight:700;">
-      </div>
-      <button type="submit" class="cta" style="justify-content:center;padding:11px 18px;" id="f-submit">Guardar resultado</button>
-    </form>
-    <div id="admin-msg" style="margin-top:12px;font-size:13px;font-weight:700;"></div>
-  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -639,13 +602,6 @@
 
   <div class="results-grid" id="results-grid"></div>
 
-  <script type="application/json" id="resultados-data">[
-    {"sorteo": 4581, "hora": "09:00 p. m.", "animalito": "CEBRA", "numero": 23},
-    {"sorteo": 4580, "hora": "08:00 p. m.", "animalito": "RATÓN", "numero": 8},
-    {"sorteo": 4579, "hora": "07:00 p. m.", "animalito": "TIGRE", "numero": 10},
-    {"sorteo": 4578, "hora": "06:00 p. m.", "animalito": "PERICO", "numero": 7}
-  ]</script>
-
   <!-- GAMES -->
   <div class="results-head" style="margin-top:34px;">
     <div class="section-title">
@@ -720,8 +676,8 @@
 
     <form id="login-form" class="auth-form">
       <div class="modal-field">
-        <label>Usuario</label>
-        <input type="text" id="login-user" autocomplete="username" required>
+        <label>Teléfono</label>
+        <input type="tel" id="login-user" autocomplete="username" placeholder="300 123 4567" required>
       </div>
       <div class="modal-field">
         <label>Contraseña</label>
@@ -729,6 +685,9 @@
       </div>
       <button type="submit" class="modal-submit">Entrar</button>
       <div class="modal-msg" id="login-msg"></div>
+      <div style="text-align:center;margin-top:10px;">
+        <span style="font-size:12px;color:var(--text-dim);">¿Olvidaste tu contraseña? Escríbele al administrador para que te ayude a restablecerla.</span>
+      </div>
     </form>
 
     <form id="register-form" class="auth-form" style="display:none;">
@@ -737,16 +696,117 @@
         <input type="text" id="reg-name" required>
       </div>
       <div class="modal-field">
-        <label>Usuario</label>
-        <input type="text" id="reg-user" autocomplete="username" required>
+        <label>Teléfono</label>
+        <input type="tel" id="reg-user" autocomplete="username" placeholder="300 123 4567" required>
       </div>
       <div class="modal-field">
         <label>Contraseña</label>
-        <input type="password" id="reg-pass" autocomplete="new-password" required>
+        <input type="password" id="reg-pass" autocomplete="new-password" required minlength="6">
       </div>
       <button type="submit" class="modal-submit">Crear cuenta</button>
       <div class="modal-msg" id="register-msg"></div>
     </form>
+  </div>
+</div>
+
+<!-- MENÚ CAJERO -->
+<div class="modal-overlay" id="cajero-modal">
+  <div class="modal-box" style="max-width:320px;">
+    <button class="modal-close" id="cajero-menu-close">✕</button>
+    <div class="modal-title display" style="font-size:15px;">TU CAJERO</div>
+    <div style="text-align:center;font-size:28px;font-weight:800;color:var(--gold);margin:10px 0 20px;" id="cajero-menu-saldo">$0</div>
+    <button type="button" class="modal-submit" id="btn-open-recarga" style="margin-bottom:10px;">Recargar saldo</button>
+    <button type="button" class="modal-submit" id="btn-open-retiro" style="background:transparent;border:1px solid var(--line);color:var(--text);">Retirar saldo</button>
+  </div>
+</div>
+
+<!-- MODAL RECARGAR -->
+<div class="modal-overlay" id="recarga-modal">
+  <div class="modal-box">
+    <button class="modal-close" id="recarga-close-btn">✕</button>
+    <div class="modal-title display" style="font-size:15px;">RECARGAR SALDO</div>
+    <div style="font-size:12.5px;color:var(--text-dim);background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:16px;">
+      <b style="color:var(--gold);">DEMO</b> — Esta es una solicitud ficticia. Escribe cualquier monto y una referencia inventada. El administrador (tú) la aprobará o rechazará desde el panel y el saldo se actualizará automáticamente.
+    </div>
+    <form id="recarga-form" class="auth-form">
+      <div class="modal-field">
+        <label>Monto</label>
+        <input type="number" id="recarga-monto" min="1" step="0.01" required>
+      </div>
+      <div class="modal-field">
+        <label>Número de referencia</label>
+        <input type="text" id="recarga-referencia" required>
+      </div>
+      <button type="submit" class="modal-submit">Enviar solicitud</button>
+      <div class="modal-msg" id="recarga-msg"></div>
+    </form>
+    <div id="recarga-historial" style="margin-top:16px;"></div>
+  </div>
+</div>
+
+<!-- MODAL RETIRAR -->
+<div class="modal-overlay" id="retiro-modal">
+  <div class="modal-box">
+    <button class="modal-close" id="retiro-close-btn">✕</button>
+    <div class="modal-title display" style="font-size:15px;">RETIRAR SALDO</div>
+    <form id="retiro-form" class="auth-form">
+      <div class="modal-field">
+        <label>Monto</label>
+        <input type="number" id="retiro-monto" min="1" step="0.01" required>
+      </div>
+      <div class="modal-field">
+        <label>Dónde recibir el pago (Nequi, Bancolombia, etc.)</label>
+        <input type="text" id="retiro-datos" placeholder="Ej. Nequi 300-1234567, Bancolombia" required>
+      </div>
+      <button type="submit" class="modal-submit">Enviar solicitud</button>
+      <div class="modal-msg" id="retiro-msg"></div>
+    </form>
+    <div id="retiro-historial" style="margin-top:16px;"></div>
+  </div>
+</div>
+
+<!-- MODAL APOSTAR -->
+<div class="modal-overlay" id="apostar-modal">
+  <div class="modal-box" style="max-width:420px;">
+    <button class="modal-close" id="apostar-close-btn">✕</button>
+    <div class="modal-title display" style="font-size:15px;">HACER UNA APUESTA</div>
+    <div style="font-size:12.5px;color:var(--text-dim);margin-bottom:14px;">
+      Elige la hora del sorteo, el animalito y el monto. Se descuenta de tu saldo al confirmar.
+      Premio: <b style="color:var(--gold);">x60</b> lo apostado.
+    </div>
+    <form id="apostar-form">
+      <div class="modal-field">
+        <label>Hora del sorteo</label>
+        <select id="apuesta-hora" required style="width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:14px;font-weight:600;">
+          <option value="">Selecciona hora…</option>
+          <option>08:00 a. m.</option>
+          <option>09:00 a. m.</option>
+          <option>10:00 a. m.</option>
+          <option>11:00 a. m.</option>
+          <option>12:00 p. m.</option>
+          <option>01:00 p. m.</option>
+          <option>02:00 p. m.</option>
+          <option>03:00 p. m.</option>
+          <option>04:00 p. m.</option>
+          <option>05:00 p. m.</option>
+          <option>06:00 p. m.</option>
+          <option>07:00 p. m.</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Animalito (número o nombre)</label>
+        <select id="apuesta-animalito" required style="width:100%;padding:11px 12px;border-radius:10px;background:var(--bg-2);border:1px solid var(--line);color:var(--text);font-family:inherit;font-size:14px;font-weight:600;">
+          <option value="">Selecciona animalito…</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Monto a apostar</label>
+        <input type="number" id="apuesta-monto" min="1" step="1" required placeholder="Ej. 100">
+      </div>
+      <button type="submit" class="modal-submit">Confirmar apuesta</button>
+      <div class="modal-msg" id="apuesta-msg"></div>
+    </form>
+    <div id="mis-apuestas" style="margin-top:18px;"></div>
   </div>
 </div>
 
@@ -767,6 +827,12 @@
 </div>
 
 <script>
+// ==== Completa esto con los datos de tu proyecto de Supabase ====
+const SUPABASE_URL = "https://jermqpozjczpjtfjkdbz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Implcm1xcG96amN6cGp0ZmprZGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMTg1MzksImV4cCI6MjEwNTY5NDUzOX0.cvtjdXVokAqXakZgmGQ2ps2v6Vtm7fiSwFkjzdHunm4";
+// ==================================================================
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 /* ============================================================
    RELOJ / CUENTA REGRESIVA REAL
    Horario de referencia investigado para loterías de "animalitos"
@@ -850,16 +916,7 @@ function todayLabel(){
   return `${pad(d.getDate())} ${meses[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-function readResultados(){
-  try{
-    return JSON.parse(document.getElementById('resultados-data').textContent);
-  }catch(e){
-    return [];
-  }
-}
-
-function renderResultados(){
-  const resultados = readResultados();
+function renderResultados(resultados){
   const grid = document.getElementById('results-grid');
   grid.innerHTML = '';
   resultados.slice(0, 8).forEach(r => {
@@ -886,131 +943,17 @@ function renderResultados(){
     grid.innerHTML = '<div style="color:var(--text-dim);font-weight:600;padding:12px;">Aún no se han cargado resultados.</div>';
   }
 }
-renderResultados();
 
-/* Botón "Juega ahora" y cajero: como es demo, solo damos feedback visual */
-document.getElementById('btn-jugar').addEventListener('click', () => {
-  alert('Esta es una demostración visual. Aquí iría el flujo real de selección de números y apuesta (requiere operador de pagos licenciado).');
-});
+async function cargarResultados(){
+  const { data, error } = await sb.from('resultados').select('*').order('sorteo', { ascending: false }).limit(8);
+  renderResultados(error ? [] : data);
+}
+cargarResultados();
 
 /* ============================================================
-   PANEL ADMINISTRADOR — guardado real y persistente
-   Usa la capacidad "artifact" de la página: al guardar un
-   resultado, se republica la página completa con el nuevo dato
-   ya incluido, y todos los que la tengan abierta la ven
-   actualizarse automáticamente.
-   ============================================================ */
-const HORAS_SORTEO = [];
-for (let h = DRAW_START_HOUR; h <= DRAW_END_HOUR; h++){
-  const ampm = h >= 12 ? 'p. m.' : 'a. m.';
-  let h12 = h % 12; if (h12 === 0) h12 = 12;
-  HORAS_SORTEO.push(`${pad(h12)}:00 ${ampm}`);
-}
-const selectHora = document.getElementById('f-hora');
-HORAS_SORTEO.slice().reverse().forEach(h => {
-  const opt = document.createElement('option');
-  opt.value = h; opt.textContent = h;
-  selectHora.appendChild(opt);
-});
-
-let artifactCap = null;
-let isWritable = false;
-
-async function initAdmin(){
-  try{
-    if (window.claude && typeof window.claude.use === 'function'){
-      artifactCap = await window.claude.use('artifact');
-    }
-  }catch(e){
-    artifactCap = null;
-  }
-
-  const modeText = document.getElementById('mode-flag-text');
-  const adminToggle = document.getElementById('admin-toggle');
-
-  if (!artifactCap){
-    modeText.textContent = 'Vista pública';
-    return;
-  }
-  // La capacidad está disponible en esta vista; el estado real de
-  // escritura (admin vs solo-lectura) se confirma en el primer intento
-  // de publicar. Mostramos el control y dejamos que publish() decida.
-  isWritable = true;
-  modeText.textContent = 'Vista pública';
-  adminToggle.style.display = 'flex';
-  adminToggle.addEventListener('click', () => {
-    const panel = document.getElementById('admin-panel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-  });
-}
-initAdmin();
-
-function nextSorteoNumber(){
-  const resultados = readResultados();
-  if (resultados.length === 0) return BASE_DRAW_NUMBER + 1;
-  return Math.max(...resultados.map(r => r.sorteo)) + 1;
-}
-
-document.getElementById('admin-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const msg = document.getElementById('admin-msg');
-  const submitBtn = document.getElementById('f-submit');
-
-  const hora = document.getElementById('f-hora').value;
-  const animalito = document.getElementById('f-animalito').value.trim().toUpperCase();
-  const numero = document.getElementById('f-numero').value;
-
-  if (!hora || !animalito || numero === ''){
-    msg.style.color = 'var(--danger-ring)';
-    msg.textContent = 'Completa todos los campos.';
-    return;
-  }
-
-  submitBtn.disabled = true;
-  msg.style.color = 'var(--text-dim)';
-  msg.textContent = 'Guardando…';
-
-  try{
-    const nuevo = { sorteo: nextSorteoNumber(), hora, animalito, numero: Number(numero) };
-    const actuales = readResultados();
-    const actualizados = [nuevo, ...actuales].slice(0, 12);
-
-    // Traemos la fuente canónica publicada (no el DOM en vivo) para
-    // no arrastrar cambios de sesión, y reemplazamos solo el bloque
-    // de datos.
-    const res = await fetch(window.location.href, { cache: 'no-store' });
-    let html = await res.text();
-
-    const re = /(<script type="application\/json" id="resultados-data">)([\s\S]*?)(<\/script>)/;
-    if (!re.test(html)){
-      throw new Error('no-template-found');
-    }
-    html = html.replace(re, (m, a, b, c) => a + JSON.stringify(actualizados) + c);
-
-    await artifactCap.publish(html);
-    // Si publish tiene éxito, esta vista también se recargará con la
-    // nueva versión — no hace falta hacer nada más aquí.
-  }catch(err){
-    submitBtn.disabled = false;
-    const code = err && err.code;
-    if (code === 'not_writer' || code === 'not_granted'){
-      msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'No tienes permiso de edición sobre esta página (vista de solo lectura).';
-      document.getElementById('admin-toggle').style.display = 'none';
-    } else if (code === 'conflict'){
-      msg.style.color = 'var(--text-dim)';
-      msg.textContent = 'Alguien más actualizó el resultado justo ahora — recargando…';
-    } else {
-      msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'No se pudo guardar. Intenta de nuevo en unos segundos.';
-    }
-  }
-});
-
-/* ============================================================
-   ENTRAR / REGISTRARSE / CAJERO
-   Demo local por navegador (localStorage): no hay servidor real
-   detrás, cada visitante tiene su propia sesión y saldo de prueba.
+   ENTRAR / REGISTRARSE / CAJERO / RECARGAS / RETIROS
+   Cuentas reales con Supabase Auth, identificadas por teléfono
+   (por dentro se usa un correo técnico derivado del teléfono).
    ============================================================ */
 (function(){
   const authModal   = document.getElementById('auth-modal');
@@ -1024,6 +967,11 @@ document.getElementById('admin-form').addEventListener('submit', async (e) => {
   const loggedInEl  = document.getElementById('auth-logged-in');
   const userNameEl  = document.getElementById('user-name-value');
   const cajeroEl    = document.getElementById('cajero-value');
+  const cajeroPill  = document.getElementById('cajero-pill');
+
+  function telefonoAEmail(tel){
+    return tel.replace(/\D/g, '') + '@telefono.guacharoactivo.app';
+  }
 
   function openModal(tab){ authModal.classList.add('open'); switchTab(tab); }
   function closeModal(){ authModal.classList.remove('open'); }
@@ -1039,88 +987,254 @@ document.getElementById('admin-form').addEventListener('submit', async (e) => {
   authModal.addEventListener('click', (e) => { if (e.target === authModal) closeModal(); });
   tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
 
-  function safeGet(key){
-    try{ return localStorage.getItem(key); } catch(e){ return null; }
-  }
-  function safeSet(key, val){
-    try{ localStorage.setItem(key, val); } catch(e){}
-  }
-  function safeRemove(key){
-    try{ localStorage.removeItem(key); } catch(e){}
-  }
-  function getUsers(){
-    try{ return JSON.parse(safeGet('ga_users') || '{}'); } catch(e){ return {}; }
-  }
-  function saveUsers(users){ safeSet('ga_users', JSON.stringify(users)); }
-
-  function renderAuthState(){
-    const session = safeGet('ga_session');
+  async function renderAuthState(){
+    const { data: { session } } = await sb.auth.getSession();
     if (session){
       loggedOutEl.style.display = 'none';
       loggedInEl.style.display = 'flex';
-      userNameEl.textContent = session;
-      const bal = Number(safeGet('ga_balance_' + session) || 0);
+      cajeroPill.style.display = 'flex';
+      userNameEl.textContent = session.user.user_metadata?.nombre || session.user.user_metadata?.telefono || 'Cuenta';
+      cajeroEl.textContent = '…';
+      const { data } = await sb.from('saldos').select('saldo').eq('user_id', session.user.id).maybeSingle();
+      const bal = data ? Number(data.saldo) : 0;
       cajeroEl.textContent = '$' + bal.toLocaleString('es-VE');
+      document.getElementById('cajero-menu-saldo').textContent = '$' + bal.toLocaleString('es-VE');
     } else {
       loggedOutEl.style.display = 'flex';
       loggedInEl.style.display = 'none';
+      cajeroPill.style.display = 'none';
       cajeroEl.textContent = '$0';
     }
   }
 
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const user = document.getElementById('login-user').value.trim();
+    const telefono = document.getElementById('login-user').value.trim();
     const pass = document.getElementById('login-pass').value;
     const msg = document.getElementById('login-msg');
-    const users = getUsers();
-    if (!users[user] || users[user].pass !== pass){
+    msg.style.color = 'var(--text-dim)'; msg.textContent = 'Entrando…';
+    const { error } = await sb.auth.signInWithPassword({ email: telefonoAEmail(telefono), password: pass });
+    if (error){
       msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Usuario o contraseña incorrectos.';
+      msg.textContent = 'Teléfono o contraseña incorrectos.';
       return;
     }
-    safeSet('ga_session', user);
     renderAuthState();
     closeModal();
     loginForm.reset();
     msg.textContent = '';
   });
 
-  registerForm.addEventListener('submit', (e) => {
+  registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('reg-name').value.trim();
-    const user = document.getElementById('reg-user').value.trim();
+    const nombre = document.getElementById('reg-name').value.trim();
+    const telefono = document.getElementById('reg-user').value.trim();
     const pass = document.getElementById('reg-pass').value;
     const msg = document.getElementById('register-msg');
-    if (!name || !user || !pass){
+    if (!nombre || !telefono || !pass){
       msg.style.color = 'var(--danger-ring)';
       msg.textContent = 'Completa todos los campos.';
       return;
     }
-    const users = getUsers();
-    if (users[user]){
+    msg.style.color = 'var(--text-dim)'; msg.textContent = 'Creando cuenta…';
+    const { error } = await sb.auth.signUp({
+      email: telefonoAEmail(telefono), password: pass,
+      options: { data: { telefono, nombre } }
+    });
+    if (error){
       msg.style.color = 'var(--danger-ring)';
-      msg.textContent = 'Ese usuario ya existe.';
+      msg.textContent = error.message.includes('registered') ? 'Ese teléfono ya tiene una cuenta.' : 'No se pudo crear la cuenta.';
       return;
     }
-    users[user] = { name, pass };
-    saveUsers(users);
-    safeSet('ga_balance_' + user, '0');
-    safeSet('ga_session', user);
     renderAuthState();
     closeModal();
     registerForm.reset();
     msg.textContent = '';
   });
 
-  loggedInEl.addEventListener('click', () => {
+  loggedInEl.addEventListener('click', async () => {
     if (confirm('¿Cerrar sesión?')){
-      safeRemove('ga_session');
+      await sb.auth.signOut();
       renderAuthState();
     }
   });
 
+  sb.auth.onAuthStateChange(() => renderAuthState());
   renderAuthState();
+
+  /* -------- Menú del cajero -------- */
+  const cajeroModal = document.getElementById('cajero-modal');
+  cajeroPill.addEventListener('click', () => cajeroModal.classList.add('open'));
+  document.getElementById('cajero-menu-close').addEventListener('click', () => cajeroModal.classList.remove('open'));
+  cajeroModal.addEventListener('click', (e) => { if (e.target === cajeroModal) cajeroModal.classList.remove('open'); });
+
+  /* -------- Recargar / Retirar -------- */
+  const recargaModal = document.getElementById('recarga-modal');
+  const retiroModal  = document.getElementById('retiro-modal');
+
+  document.getElementById('btn-open-recarga').addEventListener('click', () => {
+    cajeroModal.classList.remove('open');
+    recargaModal.classList.add('open'); cargarHistorial('recargas', 'recarga-historial');
+  });
+  document.getElementById('btn-open-retiro').addEventListener('click', () => {
+    cajeroModal.classList.remove('open');
+    retiroModal.classList.add('open'); cargarHistorial('retiros', 'retiro-historial');
+  });
+  document.getElementById('recarga-close-btn').addEventListener('click', () => recargaModal.classList.remove('open'));
+  document.getElementById('retiro-close-btn').addEventListener('click', () => retiroModal.classList.remove('open'));
+  [recargaModal, retiroModal].forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); }));
+
+  function estadoColor(estado){
+    return estado === 'aprobada' ? 'var(--gold)' : estado === 'rechazada' ? 'var(--danger-ring)' : 'var(--text-dim)';
+  }
+
+  async function cargarHistorial(tabla, contenedorId){
+    const cont = document.getElementById(contenedorId);
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ cont.innerHTML = ''; return; }
+    const { data, error } = await sb.from(tabla).select('*').eq('user_id', session.user.id).order('creado_en', { ascending: false }).limit(5);
+    if (error || !data || !data.length){ cont.innerHTML = '<div style="font-size:12px;color:var(--text-dim);">Sin solicitudes recientes.</div>'; return; }
+    cont.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px;">Tus últimas solicitudes</div>' +
+      data.map(r => `<div style="display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px;">
+        <span>$${Number(r.monto).toLocaleString('es-VE')}</span>
+        <span style="font-weight:700;color:${estadoColor(r.estado)};text-transform:capitalize;">${r.estado}</span>
+      </div>`).join('');
+  }
+
+  document.getElementById('recarga-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('recarga-msg');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
+    const monto = document.getElementById('recarga-monto').value;
+    const referencia = document.getElementById('recarga-referencia').value.trim();
+    const { error } = await sb.from('recargas').insert({ user_id: session.user.id, monto: Number(monto), referencia });
+    msg.style.color = error ? 'var(--danger-ring)' : 'var(--gold)';
+    msg.textContent = error ? 'No se pudo enviar la solicitud.' : 'Solicitud enviada. Te acreditamos al confirmar el pago.';
+    if (!error){ e.target.reset(); cargarHistorial('recargas', 'recarga-historial'); }
+  });
+
+  document.getElementById('retiro-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('retiro-msg');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
+    const monto = document.getElementById('retiro-monto').value;
+    const datos_pago = document.getElementById('retiro-datos').value.trim();
+    const { error } = await sb.from('retiros').insert({ user_id: session.user.id, monto: Number(monto), datos_pago });
+    msg.style.color = error ? 'var(--danger-ring)' : 'var(--gold)';
+    msg.textContent = error ? 'No se pudo enviar la solicitud.' : 'Solicitud enviada. La procesamos pronto.';
+    if (!error){ e.target.reset(); cargarHistorial('retiros', 'retiro-historial'); }
+  });
+
+  /* -------- APOSTAR -------- */
+  const ANIMALITOS = [
+    {n:0, nombre:'DELFÍN'},{n:00, nombre:'BALLENA'},{n:1, nombre:'CARNERO'},{n:2, nombre:'TORO'},
+    {n:3, nombre:'CIEMPÍES'},{n:4, nombre:'ALACRÁN'},{n:5, nombre:'LEÓN'},{n:6, nombre:'RANA'},
+    {n:7, nombre:'PERICO'},{n:8, nombre:'RATÓN'},{n:9, nombre:'ÁGUILA'},{n:10, nombre:'TIGRE'},
+    {n:11, nombre:'GATO'},{n:12, nombre:'CABALLO'},{n:13, nombre:'MONO'},{n:14, nombre:'PALOMA'},
+    {n:15, nombre:'ZORRO'},{n:16, nombre:'OSO'},{n:17, nombre:'PAVO'},{n:18, nombre:'BURRO'},
+    {n:19, nombre:'CHIVO'},{n:20, nombre:'COCHINO'},{n:21, nombre:'GALLO'},{n:22, nombre:'CAMELLO'},
+    {n:23, nombre:'CEBRA'},{n:24, nombre:'IGUANA'},{n:25, nombre:'GALLINA'},{n:26, nombre:'VACA'},
+    {n:27, nombre:'PERRO'},{n:28, nombre:'ZAMURO'},{n:29, nombre:'ELEFANTE'},{n:30, nombre:'CAIMÁN'},
+    {n:31, nombre:'LAPA'},{n:32, nombre:'ARDILLA'},{n:33, nombre:'PESCADO'},{n:34, nombre:'VENADO'},
+    {n:35, nombre:'JIRAFA'},{n:36, nombre:'CULEBRA'},{n:37, nombre:'TORTUGA'},{n:38, nombre:'BÚFALO'},
+    {n:39, nombre:'LECHUZA'},{n:40, nombre:'AVISPA'},{n:41, nombre:'CANGURO'},{n:42, nombre:'TUCÁN'},
+    {n:43, nombre:'MARIPOSA'},{n:44, nombre:'CHIGÜIRE'},{n:45, nombre:'GARZA'},{n:46, nombre:'PUMA'},
+    {n:47, nombre:'PAVORREAL'},{n:48, nombre:'PUERCOESPÍN'},{n:49, nombre:'PEREZA'},{n:50, nombre:'CANARIO'},
+    {n:51, nombre:'PELICANO'},{n:52, nombre:'PULPO'},{n:53, nombre:'CARACOL'},{n:54, nombre:'GRILLO'},
+    {n:55, nombre:'OSO HORMIGUERO'},{n:56, nombre:'TIBURÓN'},{n:57, nombre:'PATO'},{n:58, nombre:'HORMIGA'},
+    {n:59, nombre:'PANTERA'},{n:60, nombre:'CAMALEÓN'},{n:61, nombre:'PANDA'},{n:62, nombre:'CACHICAMO'},
+    {n:63, nombre:'CANGREJO'},{n:64, nombre:'GAVILÁN'},{n:65, nombre:'ARAÑA'},{n:66, nombre:'LOBO'},
+    {n:67, nombre:'AVESTRUZ'},{n:68, nombre:'JAGUAR'},{n:69, nombre:'CONEJO'},{n:70, nombre:'BISONTE'},
+    {n:71, nombre:'GUACAMAYA'},{n:72, nombre:'GORILA'},{n:73, nombre:'HIPOPÓTAMO'},{n:74, nombre:'TURPIAL'},
+    {n:75, nombre:'GUÁCHARO'}
+  ];
+
+  // Llenar el select de animalitos
+  const selAnimal = document.getElementById('apuesta-animalito');
+  ANIMALITOS.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.n;
+    opt.textContent = String(a.n).padStart(2,'0') + ' — ' + a.nombre;
+    selAnimal.appendChild(opt);
+  });
+
+  const apostarModal = document.getElementById('apostar-modal');
+  document.getElementById('btn-jugar').addEventListener('click', async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){
+      openModal('login');
+      return;
+    }
+    apostarModal.classList.add('open');
+    cargarMisApuestas();
+  });
+  document.getElementById('apostar-close-btn').addEventListener('click', () => apostarModal.classList.remove('open'));
+  apostarModal.addEventListener('click', (e) => { if (e.target === apostarModal) apostarModal.classList.remove('open'); });
+
+  async function cargarMisApuestas(){
+    const cont = document.getElementById('mis-apuestas');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ cont.innerHTML = ''; return; }
+    const { data, error } = await sb.from('apuestas')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('creado_en', { ascending: false })
+      .limit(8);
+    if (error || !data || !data.length){
+      cont.innerHTML = '<div style="font-size:12px;color:var(--text-dim);">Aún no tienes apuestas.</div>';
+      return;
+    }
+    cont.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:8px;">Tus últimas apuestas</div>' +
+      data.map(a => {
+        const color = a.estado === 'ganada' ? 'var(--gold)' : a.estado === 'perdida' ? 'var(--danger-ring)' : 'var(--text-dim)';
+        return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px;">
+          <span>${String(a.animalito_numero).padStart(2,'0')} ${a.animalito_nombre} · $${Number(a.monto).toLocaleString('es-VE')} · ${a.hora}</span>
+          <span style="font-weight:700;color:${color};text-transform:capitalize;">${a.estado}${a.premio > 0 ? ' +$'+Number(a.premio).toLocaleString('es-VE') : ''}</span>
+        </div>`;
+      }).join('');
+  }
+
+  document.getElementById('apostar-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('apuesta-msg');
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session){ msg.style.color = 'var(--danger-ring)'; msg.textContent = 'Entra a tu cuenta primero.'; return; }
+
+    const hora = document.getElementById('apuesta-hora').value;
+    const numero = Number(document.getElementById('apuesta-animalito').value);
+    const monto = Number(document.getElementById('apuesta-monto').value);
+    const animal = ANIMALITOS.find(a => a.n === numero);
+
+    if (!hora || !animal || !monto || monto <= 0){
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = 'Completa todos los campos.';
+      return;
+    }
+
+    msg.style.color = 'var(--text-dim)';
+    msg.textContent = 'Procesando…';
+
+    const { data, error } = await sb.rpc('crear_apuesta', {
+      p_animalito_numero: numero,
+      p_animalito_nombre: animal.nombre,
+      p_monto: monto,
+      p_hora: hora
+    });
+
+    if (error){
+      msg.style.color = 'var(--danger-ring)';
+      msg.textContent = error.message.includes('Saldo insuficiente') ? 'Saldo insuficiente.' : ('Error: ' + error.message);
+      return;
+    }
+
+    msg.style.color = 'var(--gold)';
+    msg.textContent = 'Apuesta registrada. ¡Buena suerte!';
+    e.target.reset();
+    renderAuthState();       // actualiza el saldo mostrado
+    cargarMisApuestas();
+  });
 })();
 </script>
 

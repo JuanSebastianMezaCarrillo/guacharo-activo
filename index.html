@@ -982,6 +982,15 @@ const ANIMALITOS = [
 
 function pad(n){ return String(n).padStart(2,'0'); }
 
+function codigoVisible(nombre, numero){
+  const nom = String(nombre || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (nom.indexOf('BALLENA') !== -1) return '00';
+  if (nom.indexOf('DELFIN') !== -1) return '0';
+  const n = Number(numero);
+  if (!Number.isFinite(n)) return '—';
+  return pad(n);
+}
+
 function labelVE(veHour){
   const ampm = veHour >= 12 ? 'p. m.' : 'a. m.';
   let h12 = veHour % 12; if (h12 === 0) h12 = 12;
@@ -1475,8 +1484,7 @@ cargarResultados();
     } else {
       apCont.innerHTML = apuestas.map(a => {
         const color = a.estado === 'ganada' ? 'var(--gold)' : a.estado === 'perdida' ? 'var(--danger-ring)' : 'var(--text-dim)';
-        const nom = String(a.animalito_nombre || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-        const num = nom.includes('BALLENA') ? '00' : (nom.includes('DELFIN') ? '0' : String(a.animalito_numero).padStart(2,'0'));
+        const num = codigoVisible(a.animalito_nombre, a.animalito_numero);
         return `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);">
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,#2a1a5a,#1a1038);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold);">${num}</div>

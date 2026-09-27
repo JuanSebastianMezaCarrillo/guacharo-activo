@@ -77,6 +77,15 @@
     </div>
 
     <div class="card">
+      <h3>Solicitudes de recarga y retiro</h3>
+      <p class="sub" style="margin-top:-6px;">Todas las peticiones de los usuarios, con nombre y teléfono.</p>
+      <h3 style="font-size:13px;color:var(--text-dim);">Recargas</h3>
+      <div id="sol-recargas"></div>
+      <h3 style="margin-top:18px;font-size:13px;color:var(--text-dim);">Retiros</h3>
+      <div id="sol-retiros"></div>
+    </div>
+
+    <div class="card">
       <h3>Códigos promocionales</h3>
       <label>Código</label>
       <input id="promo-codigo" placeholder="Ej. SUERTE60" style="text-transform:uppercase;">
@@ -117,7 +126,10 @@
       </div>
       <div class="msg" id="ajuste-msg"></div>
 
-      <h3 style="margin-top:10px;">Solicitudes de recarga</h3>
+      <h3 style="margin-top:10px;">Apuestas</h3>
+      <div id="det-apuestas"></div>
+
+      <h3 style="margin-top:20px;">Solicitudes de recarga</h3>
       <div id="det-recargas"></div>
 
       <h3 style="margin-top:20px;">Solicitudes de retiro</h3>
@@ -231,6 +243,7 @@ async function checkSession(){
     document.getElementById('who').textContent = session.user.user_metadata?.telefono || ADMIN_PHONE;
     cargarUsuarios();
     cargarPromos();
+    cargarSolicitudesGlobales();
   } else {
     if (session && !esAdminSession(session)){
       await sb.auth.signOut();
@@ -402,6 +415,21 @@ async function refrescarDetalle(){
   const { data: saldoRow } = await sb.from('saldos').select('saldo').eq('user_id', usuarioActual.id).maybeSingle();
   document.getElementById('det-saldo').textContent = '$' + Number(saldoRow ? saldoRow.saldo : 0).toLocaleString('es-VE');
 
+  const { data: apuestas } = await sb.from('apuestas').select('*').eq('user_id', usuarioActual.id).order('creado_en', { ascending: false }).limit(40);
+  const apCont = document.getElementById('det-apuestas');
+  if (!apuestas || !apuestas.length){
+    apCont.innerHTML = '<div class="sub">Sin apuestas.</div>';
+  } else {
+    apCont.innerHTML = apuestas.map(a => {
+      const nom = String(a.animalito_nombre||'').toUpperCase();
+      const num = nom.indexOf('BALLENA')>=0 ? '00' : (nom.indexOf('DELF')>=0 ? '0' : String(a.animalito_numero).padStart(2,'0'));
+      return `<div class="row" style="cursor:default;">
+        <div><b>${num} ${a.animalito_nombre}</b><div class="sub" style="margin:0;">${a.hora} · $${Number(a.monto).toLocaleString('es-CO')}</div></div>
+        <span class="tag tag-${a.estado==='ganada'?'aprobada':(a.estado==='perdida'?'rechazada':'pendiente')}">${a.estado}${a.premio>0?' +$'+Number(a.premio).toLocaleString('es-CO'):''}</span>
+      </div>`;
+    }).join('');
+  }
+
   const { data: recargas } = await sb.from('recargas').select('*').eq('user_id', usuarioActual.id).order('creado_en', { ascending: false });
   renderSolicitudes('det-recargas', recargas || [], 'recarga');
 
@@ -409,7 +437,24 @@ async function refrescarDetalle(){
   renderSolicitudes('det-retiros', retiros || [], 'retiro');
 }
 
-function renderSolicitudes(contId, items, tipo){
+async function cargarSolicitudesGlobales(){
+  const { data: perfiles } = await sb.from('profiles').select('id, nombre, telefono');
+  const mapa = {};
+  (perfiles || []).forEach(p => { mapa[p.id] = p; });
+
+  const rec = await sb.from('recargas').select('*').order('creado_en', { ascending: false }).limit(40);
+  const ret = await sb.from('retiros').select('*').order('creado_en', { ascending: false }).limit(40);
+
+  const conQuien = (rows) => (rows || []).map(r => ({
+    ...r,
+    profiles: mapa[r.user_id] || null
+  }));
+
+  renderSolicitudes('sol-recargas', conQuien(rec.data), 'recarga', true);
+  renderSolicitudes('sol-retiros', conQuien(ret.data), 'retiro', true);
+}
+
+function renderSolicitudes(contId, items, tipo, global){
   const cont = document.getElementById(contId);
   if (!items.length){ cont.innerHTML = '<div class="sub">Sin solicitudes.</div>'; return; }
   cont.innerHTML = '';
@@ -417,14 +462,18 @@ function renderSolicitudes(contId, items, tipo){
     const row = document.createElement('div');
     row.className = 'row';
     row.style.cursor = 'default';
-    const detalle = tipo === 'recarga' ? ('Ref: ' + (it.referencia || '—')) : (it.datos_pago || '—');
+    const quien = it.profiles
+      ? ((it.profiles.nombre || 'Sin nombre') + ' · ' + (it.profiles.telefono || ''))
+      : '';
+    const extra = tipo === 'recarga' ? ('Ref: ' + (it.referencia || '—')) : (it.datos_pago || '—');
+    const detalle = (global && quien ? quien + ' · ' : '') + extra;
     let acciones = `<span class="tag tag-${it.estado}">${it.estado}</span>`;
     if (it.estado === 'pendiente'){
       acciones = `<button class="btn-sm btn-ok" data-acc="aprobar" data-id="${it.id}" data-tipo="${tipo}">Aprobar</button>
                   <button class="btn-sm btn-no" data-acc="rechazar" data-id="${it.id}" data-tipo="${tipo}">Rechazar</button>`;
     }
     row.innerHTML = `<div>
-        <div style="font-weight:800;">$${Number(it.monto).toLocaleString('es-VE')}</div>
+        <div style="font-weight:800;">$${Number(it.monto).toLocaleString('es-CO')}</div>
         <div style="font-size:11.5px;color:var(--text-dim);">${detalle}</div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;">${acciones}</div>`;
@@ -435,7 +484,8 @@ function renderSolicitudes(contId, items, tipo){
       const fn = (btn.dataset.acc === 'aprobar' ? 'aprobar_' : 'rechazar_') + btn.dataset.tipo;
       const { error } = await sb.rpc(fn, { p_id: Number(btn.dataset.id) });
       if (error) alert('No se pudo procesar: ' + error.message);
-      refrescarDetalle();
+      if (usuarioActual) refrescarDetalle();
+      cargarSolicitudesGlobales();
     });
   });
 }

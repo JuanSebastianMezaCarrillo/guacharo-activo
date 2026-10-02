@@ -54,10 +54,10 @@
       <button class="btn-outline" id="btn-logout">Salir</button>
     </div>
     <div class="card">
-      <label>Teléfono que ya tiene cuenta</label>
-      <input id="nuevo-tel" type="tel" placeholder="Ej. 300 123 4567">
-      <button class="btn-primary" id="btn-dar">Dar permiso de administrador</button>
+      <h1 class="display" style="font-size:14px;margin-bottom:6px;">USUARIOS</h1>
+      <p class="sub" style="margin-top:0;">Desde aquí das o quitas el permiso. El dueño no se puede quitar.</p>
       <div class="msg" id="dar-msg"></div>
+      <div id="lista"></div>
     </div>
     <div class="card">
       <h1 class="display" style="font-size:14px;margin-bottom:12px;">BORRAR CUENTA</h1>
@@ -84,19 +84,32 @@ function esSupremo(session){
 }
 async function cargarLista(){
   const cont = document.getElementById('lista');
-  const { data, error } = await sb.from('admin_permisos').select('*').eq('activo', true).order('creado_en', { ascending: false });
-  if (error){ cont.innerHTML = '<div class="sub">' + error.message + '</div>'; return; }
-  if (!data || !data.length){ cont.innerHTML = '<div class="sub">Nadie más tiene permiso todavía.</div>'; return; }
-  cont.innerHTML = data.map(a => `<div class="row">
-    <div><b>${a.telefono}</b></div>
-    <button class="btn-no" data-tel="${a.telefono}">Quitar</button>
-  </div>`).join('');
+  const msg = document.getElementById('dar-msg');
+  const [{ data: perfiles, error: e1 }, { data: permisos, error: e2 }] = await Promise.all([
+    sb.from('profiles').select('id, telefono, nombre').order('telefono'),
+    sb.from('admin_permisos').select('telefono, activo')
+  ]);
+  if (e1 || e2){ cont.innerHTML = '<div class="sub">' + ((e1 || e2).message) + '</div>'; return; }
+  const activos = new Set((permisos || []).filter(p => p.activo).map(p => p.telefono));
+  if (!perfiles || !perfiles.length){ cont.innerHTML = '<div class="sub">No hay usuarios registrados.</div>'; return; }
+  cont.innerHTML = perfiles.map(p => {
+    const tel = p.telefono || '';
+    const dueno = tel === SUPREMO;
+    const admin = dueno || activos.has(tel);
+    return `<div class="row">
+      <div>
+        <b>${tel || 'sin teléfono'}</b>
+        <div class="sub" style="margin:0;">${p.nombre || 'Sin nombre'} · ${admin ? 'admin activo' : 'usuario'}</div>
+      </div>
+      ${dueno ? '<span class="sub" style="margin:0;">Dueño</span>' : `<button class="${admin ? 'btn-no' : 'btn-outline'}" data-tel="${tel}" data-acc="${admin ? 'quitar' : 'dar'}">${admin ? 'Quitar admin' : 'Dar admin'}</button>`}
+    </div>`;
+  }).join('');
   cont.querySelectorAll('[data-tel]').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const { error } = await sb.rpc('quitar_admin', { p_telefono: btn.dataset.tel });
-      const msg = document.getElementById('dar-msg');
+      const fn = btn.dataset.acc === 'dar' ? 'dar_admin' : 'quitar_admin';
+      const { error } = await sb.rpc(fn, { p_telefono: btn.dataset.tel });
       msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
-      msg.textContent = error ? error.message : 'Permiso quitado.';
+      msg.textContent = error ? error.message.replace(/.*exception: /i, '') : (btn.dataset.acc === 'dar' ? 'Permiso dado.' : 'Permiso quitado.');
       cargarLista();
     });
   });
@@ -141,15 +154,6 @@ document.getElementById('btn-login').addEventListener('click', async () => {
   checkSession();
 });
 document.getElementById('btn-logout').addEventListener('click', async () => { await sb.auth.signOut(); checkSession(); });
-document.getElementById('btn-dar').addEventListener('click', async () => {
-  const msg = document.getElementById('dar-msg');
-  const tel = document.getElementById('nuevo-tel').value.trim();
-  msg.style.color = 'var(--text-dim)'; msg.textContent = 'Guardando…';
-  const { error } = await sb.rpc('dar_admin', { p_telefono: tel });
-  msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
-  msg.textContent = error ? error.message.replace(/.*exception: /i, '') : 'Permiso dado. Ya puede entrar a admin.html.';
-  if (!error){ document.getElementById('nuevo-tel').value = ''; cargarLista(); }
-});
 document.getElementById('btn-borrar').addEventListener('click', async () => {
   const msg = document.getElementById('borrar-msg');
   const tel = document.getElementById('borrar-tel').value.trim();

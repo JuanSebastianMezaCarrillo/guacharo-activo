@@ -77,6 +77,21 @@
     </div>
 
     <div class="card">
+      <h3>Corregir un resultado</h3>
+      <p class="sub" style="margin-top:-6px;">Si te equivocaste, elige la hora ya publicada. Se quita el premio anterior y se pagan los saldos con el número correcto.</p>
+      <label>Hora ya publicada</label>
+      <select id="c-hora">
+        <option value="">Selecciona hora…</option>
+      </select>
+      <label>Animalito correcto</label>
+      <select id="c-animalito">
+        <option value="">Selecciona animalito…</option>
+      </select>
+      <button class="btn-primary" id="btn-corregir" type="button">Corregir resultado</button>
+      <div class="msg" id="corregir-msg"></div>
+    </div>
+
+    <div class="card">
       <h3>Solicitudes de recarga y retiro</h3>
       <p class="sub" style="margin-top:-6px;">Todas las peticiones de los usuarios, con nombre y teléfono.</p>
       <h3 style="font-size:13px;color:var(--text-dim);">Recargas</h3>
@@ -135,10 +150,22 @@
       <h3 style="margin-top:20px;">Solicitudes de retiro</h3>
       <div id="det-retiros"></div>
     </div>
+
+    <div class="card" id="registro-dia">
+      <h3>Registro del día</h3>
+      <p class="sub" style="margin-top:-6px;">Saldos agregados, total apostado, ganancia y pérdidas. Se guarda la semana y se borra lo que pase de 8 días.</p>
+      <button class="btn-primary" id="btn-registro" type="button">Descargar registro de hoy</button>
+      <div class="msg" id="registro-msg"></div>
+      <div id="registros-semana" style="margin-top:14px;"></div>
+    </div>
   </div>
 </div>
 
 <script>
+function diaColombia(d){
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year:'numeric', month:'2-digit', day:'2-digit' }).format(d || new Date());
+}
+function dinero(n){ return Number(n || 0).toLocaleString('es-CO'); }
 // ==== Completa esto con los datos de tu proyecto de Supabase ====
 const SUPABASE_URL = "https://jermqpozjczpjtfjkdbz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Implcm1xcG96amN6cGp0ZmprZGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMTg1MzksImV4cCI6MjEwNTY5NDUzOX0.cvtjdXVokAqXakZgmGQ2ps2v6Vtm7fiSwFkjzdHunm4";
@@ -207,13 +234,41 @@ function labelVE(veHour){
     selHora.appendChild(opt);
   });
   const selAnimal = document.getElementById('r-animalito');
+  const selCorr = document.getElementById('c-animalito');
   ANIMALITOS.forEach((a, i) => {
     const opt = document.createElement('option');
     opt.value = String(i);
     opt.textContent = a.code + ' — ' + a.nombre;
     selAnimal.appendChild(opt);
+    selCorr.appendChild(opt.cloneNode(true));
   });
 })();
+
+async function refrescarHorasResultado(){
+  const sel = document.getElementById('r-hora');
+  const corr = document.getElementById('c-hora');
+  const hoy = diaColombia();
+  const { data } = await sb.from('resultados').select('hora, animalito, creado_en').order('creado_en', { ascending: false }).limit(40);
+  const publicados = (data || []).filter(r => diaColombia(new Date(r.creado_en)) === hoy);
+  const horasPub = new Set(publicados.map(r => r.hora));
+  const previa = sel.value;
+  sel.innerHTML = '<option value="">Selecciona hora…</option>';
+  VE_HOURS.map(labelVE).filter(h => !horasPub.has(h)).forEach(h => {
+    const opt = document.createElement('option');
+    opt.value = h;
+    opt.textContent = h;
+    sel.appendChild(opt);
+  });
+  if ([...sel.options].some(o => o.value === previa)) sel.value = previa;
+  corr.innerHTML = '<option value="">Selecciona hora…</option>';
+  publicados.forEach(r => {
+    if ([...corr.options].some(o => o.value === r.hora)) return;
+    const opt = document.createElement('option');
+    opt.value = r.hora;
+    opt.textContent = r.hora + ' · ' + r.animalito;
+    corr.appendChild(opt);
+  });
+}
 
 const loginView = document.getElementById('login-view');
 const app = document.getElementById('app');
@@ -228,28 +283,36 @@ function telefonoAEmail(tel){
   return soloDigitos(tel) + '@telefono.guacharoactivo.app';
 }
 
-function esAdminSession(session){
+function esAdminSession(session, permitido){
   if (!session) return false;
   const metaTel = soloDigitos(session.user.user_metadata?.telefono);
   const emailTel = soloDigitos((session.user.email || '').split('@')[0]);
-  return metaTel === ADMIN_PHONE || emailTel === ADMIN_PHONE;
+  if (metaTel === ADMIN_PHONE || emailTel === ADMIN_PHONE) return true;
+  return !!permitido;
 }
 
 async function checkSession(){
   const { data: { session } } = await sb.auth.getSession();
-  if (session && esAdminSession(session)){
+  let permitido = false;
+  if (session){
+    const { data } = await sb.rpc('is_admin');
+    permitido = data === true;
+  }
+  if (session && esAdminSession(session, permitido)){
     loginView.style.display = 'none';
     app.style.display = 'block';
-    document.getElementById('who').textContent = session.user.user_metadata?.telefono || ADMIN_PHONE;
+    document.getElementById('who').textContent = session.user.user_metadata?.telefono || session.user.email || 'admin';
     cargarUsuarios();
     cargarPromos();
     cargarSolicitudesGlobales();
+    listarRegistros();
+    refrescarHorasResultado();
   } else {
-    if (session && !esAdminSession(session)){
+    if (session && !esAdminSession(session, permitido)){
       await sb.auth.signOut();
       const msg = document.getElementById('login-msg');
       msg.style.color = 'var(--danger)';
-      msg.textContent = 'Esta cuenta no es administrador.';
+      msg.textContent = 'Esta cuenta no tiene permiso de administrador.';
     }
     loginView.style.display = 'block';
     app.style.display = 'none';
@@ -261,13 +324,15 @@ document.getElementById('btn-login').addEventListener('click', async () => {
   const password = document.getElementById('l-pass').value;
   const msg = document.getElementById('login-msg');
   msg.style.color = 'var(--text-dim)'; msg.textContent = 'Entrando…';
-  if (soloDigitos(phone) !== ADMIN_PHONE){
-    msg.style.color = 'var(--danger)';
-    msg.textContent = 'Solo el administrador puede entrar aquí.';
-    return;
-  }
   const { error } = await sb.auth.signInWithPassword({ email: telefonoAEmail(phone), password });
   if (error){ msg.style.color = 'var(--danger)'; msg.textContent = 'Teléfono o contraseña incorrectos.'; return; }
+  const { data: permitido } = await sb.rpc('is_admin');
+  if (permitido !== true && soloDigitos(phone) !== ADMIN_PHONE){
+    await sb.auth.signOut();
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'Esta cuenta no tiene permiso de administrador.';
+    return;
+  }
   msg.textContent = '';
   checkSession();
 });
@@ -315,6 +380,28 @@ document.getElementById('btn-resultado').addEventListener('click', async () => {
 
   document.getElementById('r-hora').value = '';
   document.getElementById('r-animalito').value = '';
+  refrescarHorasResultado();
+});
+
+document.getElementById('btn-corregir').addEventListener('click', async () => {
+  const msg = document.getElementById('corregir-msg');
+  const hora = document.getElementById('c-hora').value.trim();
+  const animal = ANIMALITOS[Number(document.getElementById('c-animalito').value)];
+  if (!hora || !animal){
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'Selecciona la hora publicada y el animalito correcto.';
+    return;
+  }
+  msg.style.color = 'var(--text-dim)';
+  msg.textContent = 'Corrigiendo saldos…';
+  const { data, error } = await sb.rpc('corregir_resultado', {
+    p_hora: hora,
+    p_numero: animal.n,
+    p_animalito: animal.nombre
+  });
+  msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
+  msg.textContent = error ? error.message : 'Corregido. Se volvieron a liquidar ' + (data ?? 0) + ' apuestas.';
+  refrescarHorasResultado();
 });
 
 async function cargarPromos(){
@@ -494,10 +581,134 @@ document.getElementById('btn-ajustar').addEventListener('click', async () => {
   const msg = document.getElementById('ajuste-msg');
   const monto = document.getElementById('det-ajuste').value;
   if (monto === ''){ msg.style.color = 'var(--danger)'; msg.textContent = 'Escribe un monto.'; return; }
-  const { error } = await sb.from('saldos').upsert({ user_id: usuarioActual.id, saldo: Number(monto) });
+  const { error } = await sb.rpc('ajustar_saldo', { p_user_id: usuarioActual.id, p_nuevo: Number(monto) });
   msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
   msg.textContent = error ? 'No se pudo guardar: ' + error.message : 'Saldo actualizado.';
   if (!error){ document.getElementById('det-ajuste').value = ''; refrescarDetalle(); }
+});
+
+function esHoyCO(iso, hoy){
+  if (!iso) return false;
+  return diaColombia(new Date(iso)) === hoy;
+}
+function csvEscape(v){
+  const s = String(v ?? '');
+  return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function descargarCsv(nombre, filas){
+  const body = filas.map(r => r.map(csvEscape).join(';')).join('\n');
+  const blob = new Blob(['\uFEFF' + body], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = nombre;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+async function armarRegistro(fecha){
+  const hoy = fecha || diaColombia();
+  const [{ data: perfiles }, { data: recargas }, { data: movimientos }, { data: apuestas }] = await Promise.all([
+    sb.from('profiles').select('id, telefono, nombre'),
+    sb.from('recargas').select('user_id, monto, estado, resuelto_en, creado_en'),
+    sb.from('movimientos_saldo').select('user_id, telefono, tipo, delta, creado_en'),
+    sb.from('apuestas').select('monto, premio, estado, creado_en')
+  ]);
+  const mapa = {};
+  (perfiles || []).forEach(p => { mapa[p.id] = p; });
+  const porUsuario = {};
+  function fila(id){
+    if (!porUsuario[id]){
+      const p = mapa[id] || {};
+      porUsuario[id] = { telefono: p.telefono || '', nombre: p.nombre || '', recargas: 0, ajustes: 0 };
+    }
+    return porUsuario[id];
+  }
+  (recargas || []).filter(r => r.estado === 'aprobada' && esHoyCO(r.resuelto_en || r.creado_en, hoy)).forEach(r => {
+    fila(r.user_id).recargas += Number(r.monto || 0);
+  });
+  (movimientos || []).filter(m => esHoyCO(m.creado_en, hoy)).forEach(m => {
+    const f = fila(m.user_id);
+    f.ajustes += Number(m.delta || 0);
+    if (!f.telefono) f.telefono = m.telefono || '';
+  });
+  const detalles = Object.values(porUsuario).map(u => {
+    const neto = u.recargas + u.ajustes;
+    return { telefono: u.telefono, nombre: u.nombre, recargas: u.recargas, ajustes: u.ajustes, agregado: neto > 0 ? neto : 0 };
+  }).filter(u => u.recargas !== 0 || u.ajustes !== 0);
+  const saldosAgregados = detalles.reduce((s, u) => s + u.agregado, 0);
+  const delDia = (apuestas || []).filter(a => esHoyCO(a.creado_en, hoy));
+  const totalApostado = delDia.reduce((s, a) => s + Number(a.monto || 0), 0);
+  const premios = delDia.reduce((s, a) => s + Number(a.premio || 0), 0);
+  const ganancia = totalApostado - premios;
+  return { hoy, detalles, saldosAgregados, totalApostado, premios, ganancia, perdidas: premios };
+}
+async function guardarYLimpiar(reg){
+  await sb.from('registros_dia').upsert({
+    fecha: reg.hoy,
+    saldos_agregados: reg.saldosAgregados,
+    total_apostado: reg.totalApostado,
+    premios_pagados: reg.premios,
+    ganancia: reg.ganancia,
+    perdidas: reg.perdidas,
+    detalle: { usuarios: reg.detalles }
+  });
+  const limite = new Date();
+  limite.setDate(limite.getDate() - 8);
+  await sb.from('registros_dia').delete().lt('fecha', diaColombia(limite));
+}
+function filasCsv(reg){
+  const filas = [
+    ['Registro del día', reg.hoy],
+    [],
+    ['RESUMEN'],
+    ['Efectivo que debió entrar', reg.saldosAgregados],
+    ['Total apostado', reg.totalApostado],
+    ['Premios pagados', reg.premios],
+    ['Ganancia del administrador', reg.ganancia],
+    ['Pérdidas del día', reg.perdidas],
+    [],
+    ['EFECTIVO QUE DEBIÓ ENTRAR POR CUENTA'],
+    ['Teléfono', 'Nombre', 'Recargas aprobadas', 'Correcciones del día', 'Efectivo de esta cuenta']
+  ];
+  reg.detalles.forEach(u => filas.push([u.telefono, u.nombre, u.recargas, u.ajustes, u.agregado]));
+  if (!reg.detalles.length) filas.push(['Sin efectivo registrado este día']);
+  filas.push([]);
+  filas.push(['Nota', 'Es el efectivo que debió entrar. No resta apuestas ni retiros. Si acreditaste 30 y corregiste a 20, cuenta 20.']);
+  return filas;
+}
+async function listarRegistros(){
+  const cont = document.getElementById('registros-semana');
+  if (!cont) return;
+  const { data, error } = await sb.from('registros_dia').select('fecha, saldos_agregados, total_apostado, ganancia, perdidas').order('fecha', { ascending: false });
+  if (error || !data || !data.length){
+    cont.innerHTML = '<div class="sub">Aún no hay registros guardados.</div>';
+    return;
+  }
+  cont.innerHTML = data.map(r => `<div class="row" style="cursor:default;">
+    <div><b>${r.fecha}</b><div class="sub" style="margin:0;">Agregado $${dinero(r.saldos_agregados)} · Apostado $${dinero(r.total_apostado)} · Ganancia $${dinero(r.ganancia)}</div></div>
+    <button class="btn-outline btn-sm" data-fecha="${r.fecha}">Descargar</button>
+  </div>`).join('');
+  cont.querySelectorAll('[data-fecha]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const reg = await armarRegistro(btn.dataset.fecha);
+      descargarCsv('registro-del-dia-' + btn.dataset.fecha + '.csv', filasCsv(reg));
+    });
+  });
+}
+document.getElementById('btn-registro').addEventListener('click', async () => {
+  const msg = document.getElementById('registro-msg');
+  msg.style.color = 'var(--text-dim)';
+  msg.textContent = 'Armando registro…';
+  try {
+    const reg = await armarRegistro();
+    await guardarYLimpiar(reg);
+    descargarCsv('registro-del-dia-' + reg.hoy + '.csv', filasCsv(reg));
+    msg.style.color = 'var(--gold)';
+    msg.textContent = 'Listo. Agregado $' + dinero(reg.saldosAgregados) + ' · Apostado $' + dinero(reg.totalApostado) + ' · Ganancia $' + dinero(reg.ganancia) + ' · Pérdidas $' + dinero(reg.perdidas);
+    listarRegistros();
+  } catch (err) {
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'No se pudo armar: ' + (err.message || err);
+  }
 });
 
 checkSession();

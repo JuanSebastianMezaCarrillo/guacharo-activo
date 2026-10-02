@@ -60,8 +60,12 @@
       <div class="msg" id="dar-msg"></div>
     </div>
     <div class="card">
-      <h1 class="display" style="font-size:14px;margin-bottom:12px;">CON PERMISO</h1>
-      <div id="lista"></div>
+      <h1 class="display" style="font-size:14px;margin-bottom:12px;">BORRAR CUENTA</h1>
+      <p class="sub" style="margin-top:-6px;">Borra a cualquier usuario, incluido un admin normal. No se puede borrar tu cuenta.</p>
+      <label>Teléfono de la cuenta</label>
+      <input id="borrar-tel" type="tel" placeholder="Ej. 300 123 4567">
+      <button class="btn-primary" id="btn-borrar" style="background:#ff5f7a;color:#fff;">Borrar cuenta</button>
+      <div class="msg" id="borrar-msg"></div>
     </div>
   </div>
 </div>
@@ -145,6 +149,17 @@ document.getElementById('btn-dar').addEventListener('click', async () => {
   msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
   msg.textContent = error ? error.message.replace(/.*exception: /i, '') : 'Permiso dado. Ya puede entrar a admin.html.';
   if (!error){ document.getElementById('nuevo-tel').value = ''; cargarLista(); }
+});
+document.getElementById('btn-borrar').addEventListener('click', async () => {
+  const msg = document.getElementById('borrar-msg');
+  const tel = document.getElementById('borrar-tel').value.trim();
+  if (!tel){ msg.style.color = 'var(--danger)'; msg.textContent = 'Escribe el teléfono.'; return; }
+  if (!confirm('¿Borrar la cuenta ' + tel + '? No se puede deshacer.')) return;
+  msg.style.color = 'var(--text-dim)'; msg.textContent = 'Borrando…';
+  const { error } = await sb.rpc('eliminar_cuenta', { p_telefono: tel });
+  msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
+  msg.textContent = error ? error.message.replace(/.*exception: /i, '') : 'Cuenta borrada.';
+  if (!error){ document.getElementById('borrar-tel').value = ''; cargarLista(); }
 });
 checkSession();
 </script>

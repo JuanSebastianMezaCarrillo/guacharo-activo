@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guácharo Activo — Admin supremo</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{ --bg:#0b0620; --card:#161033; --card-2:#1c1440; --gold:#ffc233; --gold-2:#ffdd7a;
+    --text:#f4f1fb; --text-dim:#b8aed9; --line:rgba(168,140,255,0.18); --danger:#ff5f7a; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Manrope',system-ui,sans-serif;min-height:100vh;}
+  .display{font-family:'Archivo Black',system-ui,sans-serif;}
+  .wrap{max-width:560px;margin:0 auto;padding:32px 20px 80px;}
+  h1{font-size:20px;letter-spacing:-0.01em;margin:0 0 4px;}
+  .sub{color:var(--text-dim);font-size:13px;margin:0 0 24px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px;}
+  label{display:block;font-size:12px;color:var(--text-dim);font-weight:700;margin-bottom:6px;}
+  input{width:100%;padding:11px 12px;border-radius:10px;background:var(--card-2);border:1px solid var(--line);
+    color:var(--text);font-family:inherit;font-size:14px;font-weight:600;margin-bottom:12px;}
+  button{cursor:pointer;font-family:inherit;border:none;border-radius:10px;padding:11px 16px;font-weight:800;font-size:13.5px;}
+  .btn-primary{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#241000;width:100%;}
+  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .btn-no{background:transparent;border:1px solid var(--danger);color:var(--danger);padding:7px 12px;font-size:12px;}
+  .msg{font-size:13px;font-weight:700;margin-top:10px;min-height:16px;}
+  .row{display:flex;gap:10px;align-items:center;justify-content:space-between;
+    background:var(--card-2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px;}
+  #app{display:none;}
+  #topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="login-view">
+    <h1 class="display">ADMIN SUPREMO</h1>
+    <p class="sub">Solo entra el dueño. Desde aquí se da permiso para el panel de administrador.</p>
+    <div class="card">
+      <label>Teléfono</label>
+      <input id="l-phone" type="tel" autocomplete="username" placeholder="301 325 4193">
+      <label>Contraseña</label>
+      <input id="l-pass" type="password" autocomplete="current-password">
+      <button class="btn-primary" id="btn-login">Entrar</button>
+      <div class="msg" id="login-msg"></div>
+    </div>
+  </div>
+
+  <div id="app">
+    <div id="topbar">
+      <div>
+        <h1 class="display" style="font-size:16px;">PERMISOS DE ADMIN</h1>
+        <p class="sub" style="margin:2px 0 0;">Dueño: 301 325 4193</p>
+      </div>
+      <button class="btn-outline" id="btn-logout">Salir</button>
+    </div>
+    <div class="card">
+      <label>Teléfono que ya tiene cuenta</label>
+      <input id="nuevo-tel" type="tel" placeholder="Ej. 300 123 4567">
+      <button class="btn-primary" id="btn-dar">Dar permiso de administrador</button>
+      <div class="msg" id="dar-msg"></div>
+    </div>
+    <div class="card">
+      <h1 class="display" style="font-size:14px;margin-bottom:12px;">CON PERMISO</h1>
+      <div id="lista"></div>
+    </div>
+  </div>
+</div>
+<script>
+const SUPABASE_URL = "https://jermqpozjczpjtfjkdbz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Implcm1xcG96amN6cGp0ZmprZGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxMTg1MzksImV4cCI6MjEwNTY5NDUzOX0.cvtjdXVokAqXakZgmGQ2ps2v6Vtm7fiSwFkjzdHunm4";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPREMO = '3013254193';
+function soloDigitos(tel){ return String(tel || '').replace(/\D/g, ''); }
+function telefonoAEmail(tel){ return soloDigitos(tel) + '@telefono.guacharoactivo.app'; }
+function esSupremo(session){
+  if (!session) return false;
+  const metaTel = soloDigitos(session.user.user_metadata?.telefono);
+  const emailTel = soloDigitos((session.user.email || '').split('@')[0]);
+  return metaTel === SUPREMO || emailTel === SUPREMO;
+}
+async function cargarLista(){
+  const cont = document.getElementById('lista');
+  const { data, error } = await sb.from('admin_permisos').select('*').eq('activo', true).order('creado_en', { ascending: false });
+  if (error){ cont.innerHTML = '<div class="sub">' + error.message + '</div>'; return; }
+  if (!data || !data.length){ cont.innerHTML = '<div class="sub">Nadie más tiene permiso todavía.</div>'; return; }
+  cont.innerHTML = data.map(a => `<div class="row">
+    <div><b>${a.telefono}</b></div>
+    <button class="btn-no" data-tel="${a.telefono}">Quitar</button>
+  </div>`).join('');
+  cont.querySelectorAll('[data-tel]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const { error } = await sb.rpc('quitar_admin', { p_telefono: btn.dataset.tel });
+      const msg = document.getElementById('dar-msg');
+      msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
+      msg.textContent = error ? error.message : 'Permiso quitado.';
+      cargarLista();
+    });
+  });
+}
+async function checkSession(){
+  const { data: { session } } = await sb.auth.getSession();
+  let ok = esSupremo(session);
+  if (session && !ok){
+    const { data } = await sb.rpc('is_supremo');
+    ok = data === true;
+  }
+  if (session && ok){
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    cargarLista();
+  } else {
+    if (session) await sb.auth.signOut();
+    document.getElementById('login-view').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+  }
+}
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const phone = document.getElementById('l-phone').value.trim();
+  const password = document.getElementById('l-pass').value;
+  const msg = document.getElementById('login-msg');
+  msg.style.color = 'var(--text-dim)'; msg.textContent = 'Entrando…';
+  if (soloDigitos(phone) !== SUPREMO){
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'Solo el dueño puede entrar aquí.';
+    return;
+  }
+  const { error } = await sb.auth.signInWithPassword({ email: telefonoAEmail(phone), password });
+  if (error){ msg.style.color = 'var(--danger)'; msg.textContent = 'Teléfono o contraseña incorrectos.'; return; }
+  const { data } = await sb.rpc('is_supremo');
+  if (data !== true){
+    await sb.auth.signOut();
+    msg.style.color = 'var(--danger)';
+    msg.textContent = 'Esta cuenta no es el admin supremo.';
+    return;
+  }
+  msg.textContent = '';
+  checkSession();
+});
+document.getElementById('btn-logout').addEventListener('click', async () => { await sb.auth.signOut(); checkSession(); });
+document.getElementById('btn-dar').addEventListener('click', async () => {
+  const msg = document.getElementById('dar-msg');
+  const tel = document.getElementById('nuevo-tel').value.trim();
+  msg.style.color = 'var(--text-dim)'; msg.textContent = 'Guardando…';
+  const { error } = await sb.rpc('dar_admin', { p_telefono: tel });
+  msg.style.color = error ? 'var(--danger)' : 'var(--gold)';
+  msg.textContent = error ? error.message.replace(/.*exception: /i, '') : 'Permiso dado. Ya puede entrar a admin.html.';
+  if (!error){ document.getElementById('nuevo-tel').value = ''; cargarLista(); }
+});
+checkSession();
+</script>
+</body>
+</html>
